@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gym_bro_alpha/data/store.dart';
 import 'package:gym_bro_alpha/pages/home_page.dart';
 import 'package:gym_bro_alpha/pages/settings_page.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
@@ -23,10 +24,25 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   ColorSeed colorSelected = ColorSeed.baseColor;
 
+  @override
+  void initState() {
+    super.initState();
+    Store.getInt('color').then((value) {
+      setState(() {
+        colorSelected = ColorSeed.values[value ?? 0];
+      });
+    }).catchError((error) {
+      setState(() {
+        colorSelected = ColorSeed.baseColor;
+      });
+    });
+  }
+
   void handleColorSelect(int? value) {
     setState(() {
       colorSelected = value != null ? ColorSeed.values[value] : colorSelected;
     });
+    Store.saveInt('color', colorSelected.index);
   }
 
   @override
@@ -46,7 +62,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         PageRoutes.home: (ctx) => const HomePage(),
         PageRoutes.settings: (ctx) => SettingsPage(
-          colorSelected: colorSelected,
+              colorSelected: colorSelected,
               handleColorSelect: handleColorSelect,
             ),
       },
