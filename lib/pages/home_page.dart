@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:gym_bro_alpha/pages/start_page.dart';
+import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/page_routes.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage(
-      {super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int screenIndex = ScreenSelected.start.value;
 
   PreferredSizeWidget appBar(BuildContext context) {
     return AppBar(
@@ -15,26 +23,64 @@ class HomePage extends StatelessWidget {
           icon: const Icon(Icons.settings),
           onPressed: () {
             Navigator.of(context).pushNamed(PageRoutes.settings);
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => SettingsPage(
-            //       colorSelected: colorSelected,
-            //       handleColorSelect: handleColorSelect,
-            //     ),
-            //   ),
-            // );
           },
         ),
       ],
     );
   }
 
+  void handleScreenChanged(int screenSelected) {
+    setState(() {
+      screenIndex = screenSelected;
+    });
+  }
+
+  Widget createScreenFor(ScreenSelected screenSelected) {
+    switch (screenSelected) {
+      case ScreenSelected.statistics:
+        return Column(
+          children: [
+            Expanded(
+              child: IconButton(
+                icon: const Icon(Icons.bar_chart),
+                onPressed: () {},
+              ),
+            ),
+          ],
+        );
+      case ScreenSelected.start:
+        return const StartPage();
+      case ScreenSelected.add:
+        return Column(
+          children: [
+            Expanded(
+              child: IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {},
+              ),
+            ),
+          ],
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(context),
-      body: null,
+      body: createScreenFor(ScreenSelected.values[screenIndex]),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: screenIndex,
+        destinations: ScreenSelected.values
+            .map(
+              (e) => NavigationDestination(
+                icon: e.icon,
+                label: e.name,
+              ),
+            )
+            .toList(),
+        onDestinationSelected: (value) => handleScreenChanged(value),
+      ),
     );
   }
 }
