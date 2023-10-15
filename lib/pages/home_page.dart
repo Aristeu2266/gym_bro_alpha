@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_bro_alpha/pages/routines_page.dart';
 import 'package:gym_bro_alpha/pages/start_page.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/page_routes.dart';
@@ -51,16 +52,7 @@ class _HomePageState extends State<HomePage> {
       case ScreenSelected.start:
         return const StartPage();
       case ScreenSelected.add:
-        return Column(
-          children: [
-            Expanded(
-              child: IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {},
-              ),
-            ),
-          ],
-        );
+        return const RoutinesPage();
     }
   }
 
