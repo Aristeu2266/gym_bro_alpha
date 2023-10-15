@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gym_bro_alpha/data/store.dart';
 import 'package:gym_bro_alpha/pages/home_page.dart';
+import 'package:gym_bro_alpha/pages/login_page.dart';
 import 'package:gym_bro_alpha/pages/settings_page.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/page_routes.dart';
@@ -54,13 +55,16 @@ class _MyAppState extends State<MyApp> {
         colorSchemeSeed: colorSelected.color,
         brightness: Brightness.dark,
         useMaterial3: true,
+        fontFamily: 'Roboto',
       ),
       theme: ThemeData(
         colorSchemeSeed: colorSelected.color,
         useMaterial3: true,
+        fontFamily: 'Roboto',
       ),
       routes: {
         PageRoutes.home: (ctx) => const HomePage(),
+        PageRoutes.login: (ctx) => const LoginPage(),
         PageRoutes.settings: (ctx) => SettingsPage(
               colorSelected: colorSelected,
               handleColorSelect: handleColorSelect,
