@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gym_bro_alpha/data/store.dart';
+import 'package:gym_bro_alpha/pages/auth_page.dart';
 import 'package:gym_bro_alpha/pages/home_page.dart';
 import 'package:gym_bro_alpha/pages/login_page.dart';
 import 'package:gym_bro_alpha/pages/settings_page.dart';
-import 'package:gym_bro_alpha/utils/constants.dart';
+import 'package:gym_bro_alpha/pages/signup_page.dart';
+import 'package:gym_bro_alpha/utils/custom_schemes.dart';
 import 'package:gym_bro_alpha/utils/page_routes.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -23,27 +30,27 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  ColorSeed colorSelected = ColorSeed.baseColor;
+  int themeSelected = 2;
 
   @override
   void initState() {
     super.initState();
-    Store.getInt('color').then((value) {
+    Store.getInt('theme').then((value) {
       setState(() {
-        colorSelected = ColorSeed.values[value ?? 0];
+        themeSelected = value ?? 2;
       });
     }).catchError((error) {
       setState(() {
-        colorSelected = ColorSeed.baseColor;
+        themeSelected = 2;
       });
     });
   }
 
-  void handleColorSelect(int? value) {
+  void handleThemeSelect(int? value) {
     setState(() {
-      colorSelected = value != null ? ColorSeed.values[value] : colorSelected;
+      themeSelected = value ?? themeSelected;
     });
-    Store.saveInt('color', colorSelected.index);
+    Store.saveInt('theme', themeSelected);
   }
 
   @override
@@ -51,23 +58,32 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Gym Bro Alpha',
-      darkTheme: ThemeData(
-        colorSchemeSeed: colorSelected.color,
-        brightness: Brightness.dark,
-        useMaterial3: true,
-        fontFamily: 'Roboto',
-      ),
       theme: ThemeData(
-        colorSchemeSeed: colorSelected.color,
+        colorScheme: CustomSchemes.greyScheme(themeSelected != 2
+            ? Brightness.values[themeSelected]
+            : Brightness.light),
+        brightness: themeSelected != 2
+            ? Brightness.values[themeSelected]
+            : Brightness.light,
         useMaterial3: true,
         fontFamily: 'Roboto',
       ),
+      darkTheme: themeSelected == 2
+          ? ThemeData(
+              colorScheme: CustomSchemes.greyScheme(Brightness.dark),
+              brightness: Brightness.dark,
+              useMaterial3: true,
+              fontFamily: 'Roboto',
+            )
+          : null,
       routes: {
-        PageRoutes.home: (ctx) => const HomePage(),
+        PageRoutes.root: (ctx) => const AuthPage(),
         PageRoutes.login: (ctx) => const LoginPage(),
+        PageRoutes.signup: (ctx) => const SignupPage(),
+        PageRoutes.home: (ctx) => const HomePage(),
         PageRoutes.settings: (ctx) => SettingsPage(
-              colorSelected: colorSelected,
-              handleColorSelect: handleColorSelect,
+              themeSelected: themeSelected,
+              handleThemeSelect: handleThemeSelect,
             ),
       },
     );

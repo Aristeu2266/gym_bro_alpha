@@ -1,0 +1,42 @@
+import 'package:flutter/material.dart';
+import 'package:gym_bro_alpha/utils/custom_icons.dart';
+
+class AppLogo extends StatelessWidget {
+  const AppLogo({
+    required this.color,
+    required this.iconSize,
+    required this.fontSize,
+    this.gap = 4,
+    super.key,
+  });
+
+  final Color color;
+  final double iconSize;
+  final double fontSize;
+  final double gap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          CustomIcons.dumbell,
+          size: iconSize,
+          color: color,
+        ),
+        SizedBox(
+          width: gap,
+        ),
+        DefaultTextStyle(
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: fontSize,
+            color: color,
+          ),
+          child: const Text('GymBro'),
+        ),
+      ],
+    );
+  }
+}
