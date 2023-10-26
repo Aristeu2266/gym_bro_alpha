@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gym_bro_alpha/models/auth.dart';
+import 'package:gym_bro_alpha/exceptions/auth_exceptions.dart';
+import 'package:gym_bro_alpha/services/auth_service.dart';
 import 'package:gym_bro_alpha/utils/page_routes.dart';
 
 class AuthForm extends StatefulWidget {
@@ -23,7 +24,7 @@ class _AuthFormState extends State<AuthForm>
     'email': '',
     'password': '',
   };
-  String? postValidate;
+  AuthException? validateException;
 
   @override
   void initState() {
@@ -56,7 +57,7 @@ class _AuthFormState extends State<AuthForm>
   }
 
   Future<void> submitForm() async {
-    setState(() => postValidate = null);
+    setState(() => validateException = null);
 
     final isValid = _formKey.currentState?.validate() ?? false;
 
@@ -68,25 +69,16 @@ class _AuthFormState extends State<AuthForm>
 
     try {
       if (widget.sign == 'signin') {
-        await Auth.signIn(_authData['email']!, _authData['password']!);
+        await AuthService.signIn(_authData['email']!, _authData['password']!);
       } else {
-        await Auth.signUp(_authData['email']!, _authData['password']!)
+        await AuthService.signUp(_authData['email']!, _authData['password']!)
             .then((_) {
-          Auth.signIn(_authData['email']!, _authData['password']!);
+          AuthService.signIn(_authData['email']!, _authData['password']!);
         }).then((value) =>
                 Navigator.pushReplacementNamed(context, PageRoutes.root));
       }
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'INVALID_LOGIN_CREDENTIALS') {
-        setState(() => postValidate = 'Email or password provided is wrong');
-      } else if (e.code == 'too-many-requests') {
-        setState(() => postValidate = 'Too many failed login attempts!');
-      } else if (e.code == 'email-already-in-use') {
-        setState(() => postValidate = 'Email alredy in use');
-      } else {
-        print(e.code);
-        setState(() => postValidate = 'An error ocurred!');
-      }
+        setState(() => validateException = AuthException(e.code) );
     }
 
     setState(() => _isLoading = false);
@@ -106,7 +98,7 @@ class _AuthFormState extends State<AuthForm>
                 validator: (email) =>
                     (email ?? '').isEmpty ? 'Invalid email' : null,
                 onSaved: (email) => _authData['email'] = email ?? '',
-                errorText: postValidate,
+                errorText: validateException?.key != 'weak-password' ? validateException?.toString() : null,
               ),
             ),
           ),
@@ -121,6 +113,7 @@ class _AuthFormState extends State<AuthForm>
                 validator: (password) =>
                     (password ?? '').isEmpty ? 'Invalid password' : null,
                 onSaved: (password) => _authData['password'] = password ?? '',
+                errorText: validateException?.key != 'weak-password' ? null : validateException?.toString(),
               ),
             ),
           ),
@@ -237,7 +230,7 @@ class MyButton extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: TextStyle(
+        style: const TextStyle(
           fontWeight: FontWeight.w700,
           fontSize: 16,
         ),
