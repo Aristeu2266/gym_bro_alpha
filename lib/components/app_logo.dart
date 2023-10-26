@@ -6,6 +6,7 @@ class AppLogo extends StatelessWidget {
     required this.color,
     required this.iconSize,
     required this.fontSize,
+    this.showText = true,
     this.gap = 4,
     super.key,
   });
@@ -14,6 +15,7 @@ class AppLogo extends StatelessWidget {
   final double iconSize;
   final double fontSize;
   final double gap;
+  final bool showText;
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +27,11 @@ class AppLogo extends StatelessWidget {
           size: iconSize,
           color: color,
         ),
+        if (showText)
         SizedBox(
           width: gap,
         ),
+        if (showText)
         DefaultTextStyle(
           style: TextStyle(
             fontWeight: FontWeight.w700,
