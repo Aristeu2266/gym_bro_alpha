@@ -79,8 +79,10 @@ class _LoginPageState extends State<LoginPage> {
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    await AuthService.signInWithGoogle().then((value) => 
-                                    Navigator.pushReplacementNamed(context, PageRoutes.root));
+                                    await AuthService.signInWithGoogle().then(
+                                        (value) =>
+                                            Navigator.pushReplacementNamed(
+                                                context, PageRoutes.root));
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
@@ -101,10 +103,18 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                       ),
                       const Spacer(flex: 2),
+                      if (!_isLoading)
                       Hero(
                         tag: 'anonymous',
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            await AuthService.signInAnonymously().then(
+                                (value) => Navigator.pushReplacementNamed(
+                                    context, PageRoutes.root));
+                          },
                           style: TextButton.styleFrom(
                             minimumSize: const Size(250, 40),
                           ),

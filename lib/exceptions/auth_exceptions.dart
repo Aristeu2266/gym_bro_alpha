@@ -4,6 +4,7 @@ class AuthException implements Exception {
     'too-many-requests': 'Too many failed login attempts!',
     'email-already-in-use': 'Email already in use',
     'weak-password': 'Password too weak',
+    'invalid-email': 'Email badly formatted',
   };
 
   final String key;

@@ -20,7 +20,15 @@ class AuthService {
     return FirebaseAuth.instance.signOut();
   }
 
+  static Future<UserCredential> signInAnonymously() {
+    return FirebaseAuth.instance.signInAnonymously();
+  }
+
   static Future<UserCredential> signInWithGoogle() async {
+    if (FirebaseAuth.instance.currentUser == null) {
+      await signOut();
+    }
+
     final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
 
     final GoogleSignInAuthentication gAuth = await gUser!.authentication;

@@ -4,6 +4,7 @@ import 'package:gym_bro_alpha/components/auth_form.dart';
 import 'package:gym_bro_alpha/components/sign_bottom_text.dart';
 import 'package:gym_bro_alpha/pages/login_page.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
+import 'package:gym_bro_alpha/utils/page_routes.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -45,7 +46,8 @@ class _SignupPageState extends State<SignupPage>
     );
 
     a = Future.delayed(
-      const Duration(milliseconds: 400), _changeShowName,
+      const Duration(milliseconds: 400),
+      _changeShowName,
     );
   }
 
@@ -108,13 +110,9 @@ class _SignupPageState extends State<SignupPage>
                       ],
                     ),
                   ),
-
                   const Spacer(flex: 2),
-
                   const AuthForm('signup'),
-
                   const Spacer(flex: 2),
-
                   const Hero(
                     tag: 'orcontinue',
                     child: Material(
@@ -137,59 +135,63 @@ class _SignupPageState extends State<SignupPage>
                     child: _isLoading
                         ? const CircularProgressIndicator()
                         : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Hero(
-                              tag: 'googlebutton',
-                              child: ElevatedButton(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Hero(
+                                tag: 'googlebutton',
+                                child: ElevatedButton(
                                   onPressed: () async {
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    await AuthService.signInWithGoogle();
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
+                                    await AuthService.signInWithGoogle().then(
+                                        (value) =>
+                                            Navigator.pushReplacementNamed(
+                                                context, PageRoutes.root));
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: colorScheme.primaryContainer,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                    padding: const EdgeInsets.all(10)
-                                  ),
+                                      backgroundColor:
+                                          colorScheme.primaryContainer,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      padding: const EdgeInsets.all(10)),
                                   child: Image.asset(
                                     fit: BoxFit.fill,
                                     'assets/images/google.png',
                                     height: 40,
                                   ),
                                 ),
-                            ),
-                            const SizedBox(width: 10),
-                            Hero(
-                              tag: 'anonymous',
-                              child: ElevatedButton(
+                              ),
+                              const SizedBox(width: 10),
+                              Hero(
+                                tag: 'anonymous',
+                                child: ElevatedButton(
                                   onPressed: () async {
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    await AuthService.signInWithGoogle();
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
+                                    await AuthService.signInAnonymously().then(
+                                        (value) =>
+                                            Navigator.pushReplacementNamed(
+                                                context, PageRoutes.root));
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: colorScheme.primaryContainer,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                    padding: const EdgeInsets.all(10)
-                                  ),
+                                      backgroundColor:
+                                          colorScheme.primaryContainer,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      padding: const EdgeInsets.all(10)),
                                   child: Image.asset(
                                     fit: BoxFit.fill,
                                     'assets/images/anonymous.png',
                                     height: 40,
                                   ),
                                 ),
-                            ),
-                          ],
-                        ),
+                              ),
+                            ],
+                          ),
                   ),
                 ],
               ),
