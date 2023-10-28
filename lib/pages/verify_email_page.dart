@@ -54,6 +54,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
 
   @override
   void dispose() {
+    _controller!.dispose();
     timer?.cancel();
     resendTimer?.cancel();
     super.dispose();
