@@ -19,7 +19,7 @@ class _SignupPageState extends State<SignupPage>
   Animation<double>? _fadeAnimation;
   bool _isLoading = false;
   bool _showName = true;
-  late Future a;
+  late Future _nameChange;
 
   void _changeShowName() {
     setState(() {
@@ -45,7 +45,7 @@ class _SignupPageState extends State<SignupPage>
       ),
     );
 
-    a = Future.delayed(
+    _nameChange = Future.delayed(
       const Duration(milliseconds: 400),
       _changeShowName,
     );
@@ -53,7 +53,7 @@ class _SignupPageState extends State<SignupPage>
 
   @override
   void dispose() {
-    a.ignore();
+    _nameChange.ignore();
     _controller!.dispose();
     super.dispose();
   }
@@ -138,7 +138,7 @@ class _SignupPageState extends State<SignupPage>
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Hero(
-                                tag: 'googlebutton',
+                                tag: 'googlepic',
                                 child: ElevatedButton(
                                   onPressed: () async {
                                     setState(() {

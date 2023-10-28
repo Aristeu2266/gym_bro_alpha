@@ -72,61 +72,59 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(
                         child: _isLoading
                             ? const CircularProgressIndicator()
-                            : Hero(
-                                tag: 'googlebutton',
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
-                                    await AuthService.signInWithGoogle().then(
-                                        (value) =>
-                                            Navigator.pushReplacementNamed(
-                                                context, PageRoutes.root));
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        colorScheme.primaryContainer,
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Image.asset(
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+                                  await AuthService.signInWithGoogle().then(
+                                      (value) => Navigator.pushReplacementNamed(
+                                          context, PageRoutes.root));
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: colorScheme.primaryContainer,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Hero(
+                                      tag: 'googlepic',
+                                      child: Image.asset(
                                         'assets/images/google.png',
                                         height: 20,
                                       ),
-                                      const SizedBox(width: 10),
-                                      const Text('Log in with Google'),
-                                    ],
-                                  ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    const Text('Log in with Google'),
+                                  ],
                                 ),
                               ),
                       ),
                       const Spacer(flex: 2),
                       if (!_isLoading)
-                      Hero(
-                        tag: 'anonymous',
-                        child: TextButton(
-                          onPressed: () async {
-                            setState(() {
-                              _isLoading = true;
-                            });
-                            await AuthService.signInAnonymously().then(
-                                (value) => Navigator.pushReplacementNamed(
-                                    context, PageRoutes.root));
-                          },
-                          style: TextButton.styleFrom(
-                            minimumSize: const Size(250, 40),
+                        Hero(
+                          tag: 'anonymous',
+                          child: TextButton(
+                            onPressed: () async {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              await AuthService.signInAnonymously().then(
+                                  (value) => Navigator.pushReplacementNamed(
+                                      context, PageRoutes.root));
+                            },
+                            style: TextButton.styleFrom(
+                              minimumSize: const Size(250, 40),
+                            ),
+                            child: Text('Continue without an account',
+                                style: TextStyle(
+                                    color: colorScheme.primary,
+                                    decoration: TextDecoration.underline,
+                                    overflow: TextOverflow.visible),
+                                maxLines: 1,
+                                overflow: TextOverflow.visible),
                           ),
-                          child: Text('Continue without an account',
-                              style: TextStyle(
-                                  color: colorScheme.primary,
-                                  decoration: TextDecoration.underline,
-                                  overflow: TextOverflow.visible),
-                              maxLines: 1,
-                              overflow: TextOverflow.visible),
-                        ),
-                      )
+                        )
                     ],
                   ),
                 ),
