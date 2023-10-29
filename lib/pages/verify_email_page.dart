@@ -14,11 +14,13 @@ class VerifyEmailPage extends StatefulWidget {
 
 class _VerifyEmailPageState extends State<VerifyEmailPage>
     with SingleTickerProviderStateMixin {
+  User? currentUser;
   bool _isEmailVerified = false;
   bool _canResendEmail = true;
   Timer? timer;
   Timer? resendTimer;
   int resendDelay = 60;
+  Future? resendWait;
 
   AnimationController? _controller;
   Animation<Offset>? _heightAnimation;
@@ -26,8 +28,10 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
   @override
   void initState() {
     super.initState();
+    currentUser = FirebaseAuth.instance.currentUser!;
 
-    _isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+    _isEmailVerified =
+        currentUser!.isAnonymous ? true : currentUser!.emailVerified;
 
     if (!_isEmailVerified) {
       sendVerificationEmail();
@@ -54,15 +58,22 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
 
   @override
   void dispose() {
-    _controller!.dispose();
+    resendWait?.ignore();
     timer?.cancel();
     resendTimer?.cancel();
+    _controller!.dispose();
     super.dispose();
   }
 
   Future<void> checkEmailVerified() async {
-    await FirebaseAuth.instance.currentUser!.reload().catchError((_) {
+    await currentUser!.reload().catchError((_) {
       Navigator.of(context).pop();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('An error occurred'),
+        ),
+      );
     });
 
     setState(() {
@@ -78,7 +89,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
       setState(() {});
     });
 
-    await FirebaseAuth.instance.currentUser!.sendEmailVerification().catchError(
+    await currentUser!.sendEmailVerification().catchError(
       (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -88,10 +99,13 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
       },
     );
 
-    await Future.delayed(Duration(seconds: resendDelay));
-    setState(() => _canResendEmail = true);
-    resendTimer!.cancel();
-    resendTimer = null;
+    resendWait = Future.delayed(
+      Duration(seconds: resendDelay),
+      () {
+        resendTimer?.cancel();
+        setState(() => _canResendEmail = true);
+      },
+    );
   }
 
   @override
@@ -141,7 +155,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
                           minimumSize: const Size.fromHeight(50),
                         ),
                         child: Text(
-                          resendTimer == null
+                          resendTimer == null || !resendTimer!.isActive
                               ? 'Resend Email'
                               : '${resendDelay - resendTimer!.tick}',
                           style: const TextStyle(fontSize: 20),

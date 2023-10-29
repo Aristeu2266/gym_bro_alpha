@@ -69,19 +69,42 @@ class _AuthFormState extends State<AuthForm>
 
     try {
       if (widget.sign == 'signin') {
-        await AuthService.signIn(_authData['email']!, _authData['password']!);
+        await AuthService.signIn(_authData['email']!, _authData['password']!)
+            .then(
+          (value) => Navigator.pushReplacementNamed(context, PageRoutes.root),
+        );
       } else {
         await AuthService.signUp(_authData['email']!, _authData['password']!)
-            .then((_) {
-          AuthService.signIn(_authData['email']!, _authData['password']!);
-        }).then((value) =>
-                Navigator.pushReplacementNamed(context, PageRoutes.root));
+            .then((_) async {
+          await AuthService.signIn(_authData['email']!, _authData['password']!);
+        }).then(
+          (value) => Navigator.pushReplacementNamed(context, PageRoutes.root),
+        );
       }
     } on FirebaseAuthException catch (e) {
-        setState(() => validateException = AuthException(e.code) );
+      setState(() => validateException = AuthException(e.code));
     }
 
     setState(() => _isLoading = false);
+  }
+
+  String? _validatePassword(String? password) {
+    password ??= '';
+
+    if (password.isEmpty) {
+      return 'Invalid password';
+    } else if (widget.sign == 'signup') {
+      if (RegExp(r'^[\s]|[\s]$').hasMatch(password)) {
+        return 'Password can\'t begin or end with blanck spaces';
+      } else if (!RegExp(r'[A-Za-z\d@$!%*#?&\s]{6,}').hasMatch(password)) {
+        return 'Password must be at least 6 characters long';
+      } else if (!RegExp(r'(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&\s]{6,}')
+          .hasMatch(password)) {
+        return 'Password must contain at least letters and numbers';
+      }
+    }
+
+    return null;
   }
 
   @override
@@ -97,8 +120,10 @@ class _AuthFormState extends State<AuthForm>
                 hintText: 'Email',
                 validator: (email) =>
                     (email ?? '').isEmpty ? 'Invalid email' : null,
-                onSaved: (email) => _authData['email'] = email ?? '',
-                errorText: validateException?.key != 'weak-password' ? validateException?.toString() : null,
+                onSaved: (email) => _authData['email'] = email?.trim() ?? '',
+                errorText: validateException?.key != 'weak-password'
+                    ? validateException?.toString()
+                    : null,
               ),
             ),
           ),
@@ -110,10 +135,11 @@ class _AuthFormState extends State<AuthForm>
                 controller: _passwordController,
                 hintText: 'Password',
                 obscureText: true,
-                validator: (password) =>
-                    (password ?? '').isEmpty ? 'Invalid password' : null,
+                validator: (password) => _validatePassword(password),
                 onSaved: (password) => _authData['password'] = password ?? '',
-                errorText: validateException?.key != 'weak-password' ? null : validateException?.toString(),
+                errorText: validateException?.key != 'weak-password'
+                    ? null
+                    : validateException?.toString(),
               ),
             ),
           ),
