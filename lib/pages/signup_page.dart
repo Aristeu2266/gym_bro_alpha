@@ -87,10 +87,10 @@ class _SignupPageState extends State<SignupPage>
           Expanded(
             flex: 1,
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 25,
-                horizontal: 25,
-              ),
+              padding: const EdgeInsets.fromLTRB(25, 0, 25, 10
+                  // vertical: 25,
+                  // horizontal: 25,
+                  ),
               child: Column(
                 children: [
                   const Spacer(flex: 1),

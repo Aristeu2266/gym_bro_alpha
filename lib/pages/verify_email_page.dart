@@ -34,7 +34,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
         currentUser!.isAnonymous ? true : currentUser!.emailVerified;
 
     if (!_isEmailVerified) {
-      sendVerificationEmail();
+      _sendVerificationEmail();
 
       timer = Timer.periodic(
         const Duration(seconds: 5),
@@ -83,7 +83,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
     if (_isEmailVerified) timer?.cancel();
   }
 
-  Future<void> sendVerificationEmail() async {
+  Future<void> _sendVerificationEmail() async {
     setState(() => _canResendEmail = false);
     resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {});
@@ -140,15 +140,15 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
                               : constraint.biggest.height * 0.3,
                         ),
                       ),
-                      const Text(
-                        'A verification link has been sent to your email.',
-                        style: TextStyle(fontSize: 18),
+                      Text(
+                        'A verification link has been sent to ${FirebaseAuth.instance.currentUser!.email}',
+                        style: const TextStyle(fontSize: 18),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed:
-                            _canResendEmail ? sendVerificationEmail : null,
+                            _canResendEmail ? _sendVerificationEmail : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
                               Theme.of(context).colorScheme.primaryContainer,

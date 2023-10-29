@@ -4,6 +4,7 @@ import 'package:gym_bro_alpha/data/store.dart';
 import 'package:gym_bro_alpha/pages/auth_page.dart';
 import 'package:gym_bro_alpha/pages/home_page.dart';
 import 'package:gym_bro_alpha/pages/login_page.dart';
+import 'package:gym_bro_alpha/pages/reset_password_page.dart';
 import 'package:gym_bro_alpha/pages/settings_page.dart';
 import 'package:gym_bro_alpha/pages/signup_page.dart';
 import 'package:gym_bro_alpha/utils/custom_schemes.dart';
@@ -80,6 +81,7 @@ class _MyAppState extends State<MyApp> {
         PageRoutes.root: (ctx) => const AuthPage(),
         PageRoutes.login: (ctx) => const LoginPage(),
         PageRoutes.signup: (ctx) => const SignupPage(),
+        PageRoutes.resetPassword: (ctx) => const ResetPasswordPage(),
         PageRoutes.home: (ctx) => const HomePage(),
         PageRoutes.settings: (ctx) => SettingsPage(
               themeSelected: themeSelected,
