@@ -5,6 +5,7 @@ import 'package:gym_bro_alpha/components/sign_bottom_text.dart';
 import 'package:gym_bro_alpha/pages/login_page.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
 import 'package:gym_bro_alpha/utils/page_routes.dart';
+import 'package:gym_bro_alpha/utils/utils.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -144,10 +145,20 @@ class _SignupPageState extends State<SignupPage>
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    await AuthService.signInWithGoogle().then(
-                                        (value) =>
+                                    await AuthService.signInWithGoogle()
+                                        .then((_) =>
                                             Navigator.pushReplacementNamed(
-                                                context, PageRoutes.root));
+                                                context, PageRoutes.root))
+                                        .catchError((_) {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                      Utils.showTextSnackbar(
+                                        context,
+                                        'Connection failed',
+                                      );
+                                      return null;
+                                    });
                                   },
                                   style: ElevatedButton.styleFrom(
                                       backgroundColor:
@@ -171,10 +182,8 @@ class _SignupPageState extends State<SignupPage>
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    await AuthService.signInAnonymously().then(
-                                        (value) =>
-                                            Navigator.pushReplacementNamed(
-                                                context, PageRoutes.root));
+                                    Navigator.pushReplacementNamed(
+                                        context, PageRoutes.home);
                                   },
                                   style: ElevatedButton.styleFrom(
                                       backgroundColor:

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/exceptions/auth_exceptions.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
 import 'package:gym_bro_alpha/utils/page_routes.dart';
+import 'package:gym_bro_alpha/utils/utils.dart';
 
 import 'my_button.dart';
 import 'my_form_field.dart';
@@ -75,21 +76,27 @@ class _AuthFormState extends State<AuthForm>
       if (widget.sign == 'signin') {
         await AuthService.signIn(_authData['email']!, _authData['password']!)
             .then(
-          (value) => Navigator.pushReplacementNamed(context, PageRoutes.root),
+          (_) => Navigator.pushReplacementNamed(context, PageRoutes.root),
         );
       } else {
         await AuthService.signUp(_authData['email']!, _authData['password']!)
             .then((_) async {
           await AuthService.signIn(_authData['email']!, _authData['password']!);
         }).then(
-          (value) => Navigator.pushReplacementNamed(context, PageRoutes.root),
+          (_) => Navigator.pushReplacementNamed(context, PageRoutes.root),
         );
       }
     } on FirebaseAuthException catch (e) {
-      setState(() => validateException = AuthException(e.code));
+      if (e.code != 'network-request-failed') {
+        setState(() => validateException = AuthException(e.code));
+      } else if (context.mounted) {
+        Utils.showTextSnackbar(context, 'Connection failed');
+      }
     }
 
-    setState(() => _isLoading = false);
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
   }
 
   String? _validatePassword(String? password) {
@@ -102,9 +109,6 @@ class _AuthFormState extends State<AuthForm>
         return 'Password can\'t begin or end with blanck spaces';
       } else if (!RegExp(r'[A-Za-z\d@$!%*#?&\s]{6,}').hasMatch(password)) {
         return 'Password must be at least 6 characters long';
-      } else if (!RegExp(r'(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&\s]{6,}')
-          .hasMatch(password)) {
-        return 'Password must contain letters and numbers';
       }
     }
 

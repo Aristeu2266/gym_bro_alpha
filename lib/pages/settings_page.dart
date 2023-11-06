@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
+import 'package:gym_bro_alpha/utils/page_routes.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({
@@ -35,7 +36,10 @@ class SettingsPage extends StatelessWidget {
             ),
             ElevatedButton.icon(
               onPressed: () {
-                AuthService.signOut().then((value) => Navigator.of(context).pop());
+                AuthService.signOut().then(
+                  (_) =>
+                      Navigator.pushReplacementNamed(context, PageRoutes.root),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorScheme.onInverseSurface,

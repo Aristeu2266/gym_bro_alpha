@@ -4,6 +4,7 @@ import 'package:gym_bro_alpha/components/sign_bottom_text.dart';
 import 'package:gym_bro_alpha/pages/signup_page.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
 import 'package:gym_bro_alpha/utils/page_routes.dart';
+import 'package:gym_bro_alpha/utils/utils.dart';
 
 import '../components/auth_form.dart';
 
@@ -77,9 +78,20 @@ class _LoginPageState extends State<LoginPage> {
                                   setState(() {
                                     _isLoading = true;
                                   });
-                                  await AuthService.signInWithGoogle().then(
-                                      (value) => Navigator.pushReplacementNamed(
-                                          context, PageRoutes.root));
+                                  await AuthService.signInWithGoogle()
+                                      .then((_) =>
+                                          Navigator.pushReplacementNamed(
+                                              context, PageRoutes.root))
+                                      .catchError((_) {
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                    Utils.showTextSnackbar(
+                                      context,
+                                      'Connection failed',
+                                    );
+                                    return null;
+                                  });
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: colorScheme.primaryContainer,
@@ -109,9 +121,8 @@ class _LoginPageState extends State<LoginPage> {
                               setState(() {
                                 _isLoading = true;
                               });
-                              await AuthService.signInAnonymously().then(
-                                  (value) => Navigator.pushReplacementNamed(
-                                      context, PageRoutes.root));
+                              Navigator.pushReplacementNamed(
+                                  context, PageRoutes.home);
                             },
                             style: TextButton.styleFrom(
                               minimumSize: const Size(250, 40),

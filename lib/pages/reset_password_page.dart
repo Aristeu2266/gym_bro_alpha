@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/components/my_button.dart';
 import 'package:gym_bro_alpha/components/my_form_field.dart';
+import 'package:gym_bro_alpha/utils/utils.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({
@@ -33,18 +34,26 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           .then(
         (_) {
           Navigator.popUntil(context, (route) => route.isFirst);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Password reset email sent.'),
-            ),
+          Utils.showTextSnackbar(
+            context,
+            'Password reset email sent.',
           );
         },
       );
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
       setState(() {
         _isLoading = false;
-        firebaseException = 'Invalid email';
       });
+      if (e.code != 'network-request-failed') {
+        setState(() {
+          firebaseException = 'Invalid email';
+        });
+      } else if (context.mounted) {
+        Utils.showTextSnackbar(
+          context,
+          'Connection failed',
+        );
+      }
     }
   }
 
@@ -56,8 +65,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    _emailController.text =
-        ModalRoute.of(context)?.settings.arguments as String;
+    _emailController.text = _emailController.text.isEmpty
+        ? ModalRoute.of(context)?.settings.arguments as String
+        : _emailController.text;
 
     return Scaffold(
       appBar: AppBar(

@@ -5,4 +5,5 @@ class PageRoutes {
   static const resetPassword = '/resetPassword';
   static const home = '/home';
   static const settings = '/settings';
+  static const workout = '/workout';
 }

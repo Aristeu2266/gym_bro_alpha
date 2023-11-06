@@ -26,10 +26,6 @@ class AuthService {
     return _auth.signOut();
   }
 
-  static Future<UserCredential> signInAnonymously() {
-    return _auth.signInAnonymously();
-  }
-
   static Future<UserCredential> signInWithGoogle() async {
     final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
 
@@ -42,4 +38,6 @@ class AuthService {
 
     return _auth.signInWithCredential(credential);
   }
+
+  static void signInOffline() {}
 }

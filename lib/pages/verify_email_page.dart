@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gym_bro_alpha/pages/home_page.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
+import 'package:gym_bro_alpha/utils/page_routes.dart';
+import 'package:gym_bro_alpha/utils/utils.dart';
 
 class VerifyEmailPage extends StatefulWidget {
   const VerifyEmailPage({super.key});
@@ -66,21 +67,28 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
   }
 
   Future<void> checkEmailVerified() async {
-    await currentUser!.reload().catchError((_) {
-      Navigator.of(context).pop();
+    try {
+      await currentUser!.reload();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('An error occurred'),
-        ),
-      );
-    });
+      setState(() {
+        _isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+      });
 
-    setState(() {
-      _isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
-    });
+      if (_isEmailVerified) {
+        timer?.cancel();
+        if (context.mounted) {
+          Navigator.pushReplacementNamed(context, PageRoutes.home);
+        }
+      }
+    } catch (_) {
+      AuthService.signOut().then((_) {
+        Navigator.pushReplacementNamed(context, PageRoutes.root);
+      });
 
-    if (_isEmailVerified) timer?.cancel();
+      if (context.mounted) {
+        Utils.showTextSnackbar(context, 'Connection failed');
+      }
+    }
   }
 
   Future<void> _sendVerificationEmail() async {
@@ -91,11 +99,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
 
     await currentUser!.sendEmailVerification().catchError(
       (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Too many attempts'),
-          ),
-        );
+        Utils.showTextSnackbar(context, 'Too many attempts');
       },
     );
 
@@ -110,77 +114,77 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
 
   @override
   Widget build(BuildContext context) {
-    return _isEmailVerified
-        ? const HomePage()
-        : Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                onPressed: () {
-                  AuthService.signOut();
-                },
-                icon: const Icon(Icons.arrow_back_rounded),
-              ),
-              title: const Text('Verify Email'),
-            ),
-            body: Center(
-              child: LayoutBuilder(builder: (context, constraint) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Spacer(flex: 5),
-                      SlideTransition(
-                        position: _heightAnimation!,
-                        child: Icon(
-                          Icons.mark_email_unread_outlined,
-                          size: constraint.biggest.width <
-                                  constraint.biggest.height
-                              ? constraint.biggest.width * 0.3
-                              : constraint.biggest.height * 0.3,
-                        ),
-                      ),
-                      Text(
-                        'A verification link has been sent to ${FirebaseAuth.instance.currentUser!.email}',
-                        style: const TextStyle(fontSize: 18),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed:
-                            _canResendEmail ? _sendVerificationEmail : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
-                          minimumSize: const Size.fromHeight(50),
-                        ),
-                        child: Text(
-                          resendTimer == null || !resendTimer!.isActive
-                              ? 'Resend Email'
-                              : '${resendDelay - resendTimer!.tick}',
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      TextButton(
-                        onPressed: () => AuthService.signOut(),
-                        style: TextButton.styleFrom(
-                          minimumSize: const Size.fromHeight(50),
-                        ),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 18,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                      const Spacer(flex: 6),
-                    ],
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            AuthService.signOut().then((_) {
+              Navigator.pushReplacementNamed(context, PageRoutes.root);
+            });
+          },
+          icon: const Icon(Icons.arrow_back_rounded),
+        ),
+        title: const Text('Verify Email'),
+      ),
+      body: Center(
+        child: LayoutBuilder(builder: (context, constraint) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Spacer(flex: 5),
+                SlideTransition(
+                  position: _heightAnimation!,
+                  child: Icon(
+                    Icons.mark_email_unread_outlined,
+                    size: constraint.biggest.width < constraint.biggest.height
+                        ? constraint.biggest.width * 0.3
+                        : constraint.biggest.height * 0.3,
                   ),
-                );
-              }),
+                ),
+                Text(
+                  'A verification link has been sent to ${FirebaseAuth.instance.currentUser!.email}',
+                  style: const TextStyle(fontSize: 18),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: _canResendEmail ? _sendVerificationEmail : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    minimumSize: const Size.fromHeight(50),
+                  ),
+                  child: Text(
+                    resendTimer == null || !resendTimer!.isActive
+                        ? 'Resend Email'
+                        : '${resendDelay - resendTimer!.tick}',
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: () => AuthService.signOut().then((_) {
+                    Navigator.pushReplacementNamed(context, PageRoutes.root);
+                  }),
+                  style: TextButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                  ),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                      fontSize: 18,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+                const Spacer(flex: 6),
+              ],
             ),
           );
+        }),
+      ),
+    );
   }
 }

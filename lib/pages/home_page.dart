@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:gym_bro_alpha/pages/routines_page.dart';
+import 'package:gym_bro_alpha/pages/workout_list_page.dart';
 import 'package:gym_bro_alpha/pages/start_page.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/page_routes.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({required this.refreshTheme, super.key});
+
+  final Future<void> Function() refreshTheme;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -13,8 +15,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int screenIndex = ScreenSelected.start.value;
+  PageController pageController = PageController();
 
-  PreferredSizeWidget appBar(BuildContext context) {
+  @override
+  void initState() {
+    super.initState();
+    widget.refreshTheme();
+  }
+
+  PreferredSizeWidget appBar() {
     return AppBar(
       title: const Text('GymBro'),
       centerTitle: true,
@@ -31,36 +40,35 @@ class _HomePageState extends State<HomePage> {
   }
 
   void handleScreenChanged(int screenSelected) {
+    pageController.animateToPage(screenSelected,
+        duration: const Duration(milliseconds: 1), curve: Curves.ease);
     setState(() {
       screenIndex = screenSelected;
     });
   }
 
-  Widget createScreenFor(ScreenSelected screenSelected) {
-    switch (screenSelected) {
-      case ScreenSelected.statistics:
-        return Column(
-          children: [
-            Expanded(
-              child: IconButton(
-                icon: const Icon(Icons.bar_chart),
-                onPressed: () {},
-              ),
-            ),
-          ],
-        );
-      case ScreenSelected.start:
-        return const StartPage();
-      case ScreenSelected.add:
-        return const RoutinesPage();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(context),
-      body: createScreenFor(ScreenSelected.values[screenIndex]),
+      appBar: appBar(),
+      body: PageView(
+        controller: pageController,
+        onPageChanged: (value) => setState(() => screenIndex = value),
+        children: [
+          Column(
+            children: [
+              Expanded(
+                child: IconButton(
+                  icon: const Icon(Icons.bar_chart),
+                  onPressed: () {},
+                ),
+              ),
+            ],
+          ),
+          const StartPage(),
+          const WorkoutListPage(),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: screenIndex,
         destinations: ScreenSelected.values
