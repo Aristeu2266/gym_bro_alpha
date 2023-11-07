@@ -1,8 +1,8 @@
 class WorkoutModel {
   final int id;
-  final String userId;
+  final String uId;
   final bool isActive;
-  final int order;
+  final int sortOrder;
   final String name;
   final DateTime creation;
   List exercises = [];
@@ -10,21 +10,32 @@ class WorkoutModel {
 
   WorkoutModel({
     required this.id,
-    required this.userId,
+    required this.uId,
     required this.isActive,
-    required this.order,
+    required this.sortOrder,
     required this.name,
     required this.creation,
   });
 
-  Map<String, dynamic> toMap() {
+  Map<String, Object> toMap() {
     return {
       'id': id,
-      'userId': userId,
-      'isActive': isActive,
-      'order': order,
+      'uId': uId,
+      'isActive': isActive ? 1 : 0,
+      'sortOrder': sortOrder,
       'name': name,
-      'creation': creation,
+      'creation': creation.toIso8601String(),
     };
+  }
+
+  static WorkoutModel mapToModel(Map<String, Object?> map) {
+    return WorkoutModel(
+      id: map['id'] as int,
+      uId: map['uId'] as String,
+      isActive: (map['isActive'] as int) == 1 ? true : false,
+      sortOrder: map['sortOrder'] as int,
+      name: map['name'] as String,
+      creation: DateTime.parse(map['creation'] as String),
+    );
   }
 }

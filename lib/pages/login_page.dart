@@ -3,7 +3,7 @@ import 'package:gym_bro_alpha/components/app_logo.dart';
 import 'package:gym_bro_alpha/components/sign_bottom_text.dart';
 import 'package:gym_bro_alpha/pages/signup_page.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
-import 'package:gym_bro_alpha/utils/page_routes.dart';
+import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/utils.dart';
 
 import '../components/auth_form.dart';

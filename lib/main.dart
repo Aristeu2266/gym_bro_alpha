@@ -10,8 +10,8 @@ import 'package:gym_bro_alpha/pages/reset_password_page.dart';
 import 'package:gym_bro_alpha/pages/workout_page.dart';
 import 'package:gym_bro_alpha/pages/settings_page.dart';
 import 'package:gym_bro_alpha/pages/signup_page.dart';
+import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/custom_schemes.dart';
-import 'package:gym_bro_alpha/utils/page_routes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -64,6 +64,10 @@ class _MyAppState extends State<MyApp> {
         themeSelected = result[0]['theme'] as int;
       });
     } else {
+      await db.insert(TableNames.userPrefs, {
+        'uid': FirebaseAuth.instance.currentUser?.uid ?? 'null',
+        'theme': 2,
+      });
       setState(() {
         themeSelected = 2;
       });
@@ -79,14 +83,9 @@ class _MyAppState extends State<MyApp> {
       'uid': FirebaseAuth.instance.currentUser?.uid ?? 'null',
       'theme': themeSelected,
     };
-    db
-        .insert(
-      'user_prefs',
-      data,
-    )
-        .catchError((id) {
+    db.insert(TableNames.userPrefs, data).catchError((id) {
       return db.update(
-        'user_prefs',
+        TableNames.userPrefs,
         data,
         where: 'uid = ?',
         whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
@@ -130,6 +129,12 @@ class _MyAppState extends State<MyApp> {
               handleThemeSelect: handleThemeSelect),
           PageRoutes.workout: (ctx) => const WorkoutPage(),
         },
+        // onGenerateRoute: (settings) {
+        //   Map<String, WidgetBuilder> routes = {
+        //     PageRoutes.workout: (ctx) => WorkoutPage(),
+        //   };
+        //   WidgetBuilder builder = routes
+        // },
       ),
     );
   }

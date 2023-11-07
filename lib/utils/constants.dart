@@ -9,3 +9,18 @@ enum ScreenSelected {
   final int value;
   final Icon icon;
 }
+
+class PageRoutes {
+  static const root = '/';
+  static const login = '/login';
+  static const signup = '/signup';
+  static const resetPassword = '/resetPassword';
+  static const home = '/home';
+  static const settings = '/settings';
+  static const workout = '/workout';
+}
+
+class TableNames {
+  static const userPrefs = 'user_prefs';
+  static const workouts = 'workouts';
+}

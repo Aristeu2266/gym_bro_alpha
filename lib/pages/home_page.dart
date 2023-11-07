@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gym_bro_alpha/models/workout_list_model.dart';
 import 'package:gym_bro_alpha/pages/workout_list_page.dart';
 import 'package:gym_bro_alpha/pages/start_page.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
-import 'package:gym_bro_alpha/utils/page_routes.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({required this.refreshTheme, super.key});
@@ -22,6 +23,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     pageController = PageController(initialPage: screenIndex);
     widget.refreshTheme();
+    Provider.of<WorkoutListModel>(context, listen: false).load();
   }
 
   @override
@@ -76,6 +78,7 @@ class _HomePageState extends State<HomePage> {
           const WorkoutListPage(),
         ],
       ),
+      extendBody: false,
       bottomNavigationBar: NavigationBar(
         selectedIndex: screenIndex,
         destinations: ScreenSelected.values

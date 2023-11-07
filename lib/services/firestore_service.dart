@@ -3,11 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gym_bro_alpha/models/workout_model.dart';
 
 class FireStoreService {
-  late final CollectionReference collection;
-
-  FireStoreService(String path) {
-    collection = FirebaseFirestore.instance.collection(path);
-  }
+  FireStoreService();
 
   Future<void> workoutToCloud(String name) async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -22,9 +18,9 @@ class FireStoreService {
       return workoutDoc.set(
         WorkoutModel(
           id: workoutDoc.id as int,
-          userId: user.uid,
+          uId: user.uid,
           isActive: true,
-          order: snapshot.count,
+          sortOrder: snapshot.count,
           name: name,
           creation: DateTime.now(),
         ).toMap(),

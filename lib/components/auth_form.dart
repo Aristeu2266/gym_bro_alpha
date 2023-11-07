@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/exceptions/auth_exceptions.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
-import 'package:gym_bro_alpha/utils/page_routes.dart';
+import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/utils.dart';
 
 import 'my_button.dart';

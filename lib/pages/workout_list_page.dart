@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/components/workout_list_tile.dart';
 import 'package:gym_bro_alpha/models/workout_list_model.dart';
-import 'package:gym_bro_alpha/utils/page_routes.dart';
+import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:provider/provider.dart';
 
 class WorkoutListPage extends StatelessWidget {
@@ -11,30 +11,33 @@ class WorkoutListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final workoutList = Provider.of<WorkoutListModel>(context);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ReorderableListView.builder(
-            onReorder: (oldIndex, newIndex) {},
-            itemCount: workoutList.workouts.length,
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            header: const Text(
-              'Workouts',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ReorderableListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              onReorder: (oldIndex, newIndex) {},
+              itemCount: workoutList.workouts.length,
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              header: const Text(
+                'Workouts',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
+              itemBuilder: (ctx, index) {
+                return WorkoutListTile(
+                  workoutList.workouts[index],
+                  key: ValueKey(workoutList.workouts[index]),
+                );
+              },
             ),
-            itemBuilder: (ctx, index) {
-              return WorkoutListTile(
-                workoutList.workouts[index],
-                key: ValueKey(workoutList.workouts[index]),
-              );
-            },
-            footer: Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
@@ -54,8 +57,8 @@ class WorkoutListPage extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
