@@ -3,6 +3,7 @@ import 'package:gym_bro_alpha/components/app_logo.dart';
 import 'package:gym_bro_alpha/components/sign_bottom_text.dart';
 import 'package:gym_bro_alpha/pages/signup_page.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
+import 'package:gym_bro_alpha/services/store.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/utils.dart';
 
@@ -79,9 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                                     _isLoading = true;
                                   });
                                   await AuthService.signInWithGoogle()
-                                      .then((_) =>
-                                          Navigator.pushReplacementNamed(
-                                              context, PageRoutes.root))
+                                      // ignore: body_might_complete_normally_catch_error
                                       .catchError((_) {
                                     if (mounted) {
                                       setState(() {
@@ -92,7 +91,6 @@ class _LoginPageState extends State<LoginPage> {
                                       context,
                                       'Connection failed',
                                     );
-                                    return null;
                                   });
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -123,8 +121,14 @@ class _LoginPageState extends State<LoginPage> {
                               setState(() {
                                 _isLoading = true;
                               });
-                              Navigator.pushReplacementNamed(
-                                  context, PageRoutes.home);
+                              await Store.updateSignInDate('null').then(
+                                (_) {
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    PageRoutes.home,
+                                  );
+                                },
+                              );
                             },
                             style: TextButton.styleFrom(
                               minimumSize: const Size(250, 40),

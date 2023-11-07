@@ -37,8 +37,13 @@ class SettingsPage extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: () {
                 AuthService.signOut().then(
-                  (_) =>
-                      Navigator.pushReplacementNamed(context, PageRoutes.root),
+                  (value) {
+                    Navigator.popUntil(
+                      context,
+                      ((route) => route.isFirst),
+                    );
+                    Navigator.pushReplacementNamed(context, PageRoutes.root);
+                  },
                 );
               },
               style: ElevatedButton.styleFrom(

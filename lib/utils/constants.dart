@@ -23,4 +23,5 @@ class PageRoutes {
 class TableNames {
   static const userPrefs = 'user_prefs';
   static const workouts = 'workouts';
+  static const toBeUploaded = 'to_be_uploaded';
 }

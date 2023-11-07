@@ -10,7 +10,7 @@ class DB {
   static Database? _database;
 
   Future<Database> get database async {
-    // deleteDatabase(join(await getDatabasesPath(), 'gymbro.db'));
+    // await deleteDatabase(join(await getDatabasesPath(), 'gymbro.db'));
     if (_database != null) return _database!;
 
     return await _initDatabase();
@@ -28,14 +28,16 @@ class DB {
     // print('criado base de novo');
     await db.execute(_userPrefsTable);
     await db.execute(_workoutsTable);
+    await db.execute(_toBeUploaded);
   }
 
   String get _userPrefsTable => '''
     CREATE TABLE ${TableNames.userPrefs} (
       uid TEXT PRIMARY KEY,
-      theme INTEGER
+      theme INTEGER,
+      lastLogin DATETIME NOT NULL
     );
-''';
+  ''';
 
   String get _workoutsTable => '''
     CREATE TABLE ${TableNames.workouts} (
@@ -46,6 +48,15 @@ class DB {
       name TEXT NOT NULL,
       creation DATETIME NOT NULL,
       PRIMARY KEY (id, uId)
-);
-''';
+    );
+  ''';
+
+  String get _toBeUploaded => '''
+    CREATE TABLE ${TableNames.toBeUploaded} (
+      origin TEXT NOT NULL,
+      id INTEGER NOT NULL,
+      uid TEXT NOT NULL,
+      PRIMARY KEY (origin, id, uid)
+    );
+  ''';
 }

@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 class HomePage extends StatefulWidget {
   const HomePage({required this.refreshTheme, super.key});
 
-  final Future<void> Function() refreshTheme;
+  final Future<void> Function([bool?]) refreshTheme;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     pageController = PageController(initialPage: screenIndex);
-    widget.refreshTheme();
+    widget.refreshTheme(true);
     Provider.of<WorkoutListModel>(context, listen: false).load();
   }
 

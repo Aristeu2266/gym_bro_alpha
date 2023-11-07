@@ -10,6 +10,7 @@ import 'package:gym_bro_alpha/pages/reset_password_page.dart';
 import 'package:gym_bro_alpha/pages/workout_page.dart';
 import 'package:gym_bro_alpha/pages/settings_page.dart';
 import 'package:gym_bro_alpha/pages/signup_page.dart';
+import 'package:gym_bro_alpha/services/store.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/custom_schemes.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -50,13 +51,16 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future<void> loadTheme() async {
+  Future<void> loadTheme([bool? uid]) async {
     db = await DB.instance.database;
     var result = await db.query(
-      'user_prefs',
-      limit: 1,
+      TableNames.userPrefs,
       where: 'uid = ?',
-      whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
+      whereArgs: [
+        uid ?? false
+            ? FirebaseAuth.instance.currentUser?.uid ?? 'null'
+            : await Store.latestUId
+      ],
     );
 
     if (result.isNotEmpty) {
@@ -64,9 +68,15 @@ class _MyAppState extends State<MyApp> {
         themeSelected = result[0]['theme'] as int;
       });
     } else {
-      await db.insert(TableNames.userPrefs, {
-        'uid': FirebaseAuth.instance.currentUser?.uid ?? 'null',
-        'theme': 2,
+      await db.insert(
+        TableNames.userPrefs,
+        {
+          'uId': FirebaseAuth.instance.currentUser?.uid ?? 'null',
+          'theme': 2,
+          'lastLogin': DateTime.now().toIso8601String(),
+        },
+      ).catchError((_) {
+        return 0;
       });
       setState(() {
         themeSelected = 2;
@@ -80,17 +90,14 @@ class _MyAppState extends State<MyApp> {
     });
     db = await DB.instance.database;
     Map<String, dynamic> data = {
-      'uid': FirebaseAuth.instance.currentUser?.uid ?? 'null',
       'theme': themeSelected,
     };
-    db.insert(TableNames.userPrefs, data).catchError((id) {
-      return db.update(
-        TableNames.userPrefs,
-        data,
-        where: 'uid = ?',
-        whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
-      );
-    });
+    await db.update(
+      TableNames.userPrefs,
+      data,
+      where: 'uid = ?',
+      whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
+    );
   }
 
   @override

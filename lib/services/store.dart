@@ -1,12 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gym_bro_alpha/models/workout_model.dart';
-import 'package:gym_bro_alpha/services/firestore_service.dart';
 import 'package:gym_bro_alpha/services/local_storage.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:sqflite/sqflite.dart';
 
 class Store {
-  static final FireStoreService userCol = FireStoreService();
   static final User? user = FirebaseAuth.instance.currentUser;
   static late Database db;
 
@@ -17,6 +17,39 @@ class Store {
       TableNames.workouts,
       where: 'uId = ?',
       whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
+    );
+  }
+
+  static Future<String> get latestUId async {
+    db = await DB.instance.database;
+
+    final mostRecent = await db.query(
+      TableNames.userPrefs,
+      columns: ['MAX(lastLogin) AS lastLogin'],
+    );
+
+    final row = await db.query(TableNames.userPrefs,
+        columns: ['uId'],
+        where: 'lastLogin = ?',
+        whereArgs: [
+          (mostRecent.isNotEmpty
+              ? mostRecent[0]['lastLogin'] ?? 'null'
+              : 'null') as String
+        ]);
+
+    return row.isNotEmpty ? (row[0]['uid'] ?? 'null') as String : 'null';
+  }
+
+  static Future<int> updateSignInDate(String uid) async {
+    db = await DB.instance.database;
+
+    return db.update(
+      TableNames.userPrefs,
+      {
+        'lastLogin': DateTime.now().toIso8601String(),
+      },
+      where: 'uId = ?',
+      whereArgs: [uid],
     );
   }
 
@@ -45,6 +78,25 @@ class Store {
       workout.toMap(),
     );
 
+    final connectivity = await Connectivity().checkConnectivity();
+    if (user != null) {
+      if (connectivity != ConnectivityResult.none) {
+        _workoutToCloud(workout);
+      } else {}
+    }
+
     return workout;
+  }
+
+  static Future<void> _workoutToCloud(WorkoutModel workout) async {
+    final workoutCol = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('workouts');
+    final workoutDoc = workoutCol.doc('${workout.id}');
+
+    return workoutDoc.set(
+      workout.toMap(),
+    );
   }
 }

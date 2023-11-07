@@ -4,6 +4,7 @@ import 'package:gym_bro_alpha/components/auth_form.dart';
 import 'package:gym_bro_alpha/components/sign_bottom_text.dart';
 import 'package:gym_bro_alpha/pages/login_page.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
+import 'package:gym_bro_alpha/services/store.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/utils.dart';
 
@@ -146,18 +147,17 @@ class _SignupPageState extends State<SignupPage>
                                       _isLoading = true;
                                     });
                                     await AuthService.signInWithGoogle()
-                                        .then((_) =>
-                                            Navigator.pushReplacementNamed(
-                                                context, PageRoutes.root))
+                                        // ignore: body_might_complete_normally_catch_error
                                         .catchError((_) {
-                                      setState(() {
-                                        _isLoading = false;
-                                      });
+                                      if (mounted) {
+                                        setState(() {
+                                          _isLoading = false;
+                                        });
+                                      }
                                       Utils.showTextSnackbar(
                                         context,
                                         'Connection failed',
                                       );
-                                      return null;
                                     });
                                   },
                                   style: ElevatedButton.styleFrom(
@@ -182,8 +182,14 @@ class _SignupPageState extends State<SignupPage>
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    Navigator.pushReplacementNamed(
-                                        context, PageRoutes.home);
+                                    await Store.updateSignInDate('null').then(
+                                      (_) {
+                                        Navigator.pushReplacementNamed(
+                                          context,
+                                          PageRoutes.home,
+                                        );
+                                      },
+                                    );
                                   },
                                   style: ElevatedButton.styleFrom(
                                       backgroundColor:

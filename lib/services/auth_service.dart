@@ -1,5 +1,6 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gym_bro_alpha/services/store.dart';
 
 class AuthService {
   static final _auth = FirebaseAuth.instance;
@@ -12,7 +13,9 @@ class AuthService {
     return _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
-    );
+    )..then(
+        (user) => Store.updateSignInDate(user.user?.uid ?? 'null'),
+      );
   }
 
   static Future<UserCredential> signUp(String email, String password) {
@@ -36,8 +39,9 @@ class AuthService {
       idToken: gAuth.idToken,
     );
 
-    return _auth.signInWithCredential(credential);
+    return _auth.signInWithCredential(credential)
+      ..then(
+        (user) => Store.updateSignInDate(user.user?.uid ?? 'null'),
+      );
   }
-
-  static void signInOffline() {}
 }
