@@ -8,8 +8,8 @@ class DB {
 
   static Database? _database;
 
-  get database async {
-    if (_database != null) return _database;
+  Future<Database> get database async {
+    if (_database != null) return _database!;
 
     return await _initDatabase();
   }
@@ -24,7 +24,7 @@ class DB {
 
   _onCreate(Database db, int versao) async {
     await db.execute(_userPrefs);
-    await db.insert('user_prefs', {'theme': 2});
+    await db.insert('user_prefs', {'uid': 'null', 'theme': 2});
   }
 
   String get _userPrefs => '''
@@ -32,5 +32,12 @@ class DB {
       uid TEXT PRIMARY KEY,
       theme INTEGER
     );
+''';
+
+  String get _workoutsTable => '''
+    CREATE TABLE workouts (
+      id INT PRIMARY KEY AUTOINCREMENT,
+      uid TEXT
+    ) WITHOUT ROWID;
 ''';
 }

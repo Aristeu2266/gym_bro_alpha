@@ -21,7 +21,7 @@ class FireStoreService {
 
       return workoutDoc.set(
         WorkoutModel(
-          id: workoutDoc.id,
+          id: workoutDoc.id as int,
           userId: user.uid,
           isActive: true,
           order: snapshot.count,

@@ -8,7 +8,7 @@ class WorkoutListModel with ChangeNotifier {
 
   void addWorkout(String workoutName) {
     workouts.add(WorkoutModel(
-        id: 'id',
+        id: 1,
         userId: 'userId',
         isActive: true,
         order: 1,

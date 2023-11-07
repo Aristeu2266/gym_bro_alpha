@@ -15,12 +15,19 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int screenIndex = ScreenSelected.start.value;
-  PageController pageController = PageController();
+  late PageController pageController;
 
   @override
   void initState() {
     super.initState();
+    pageController = PageController(initialPage: screenIndex);
     widget.refreshTheme();
+  }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
   }
 
   PreferredSizeWidget appBar() {

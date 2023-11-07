@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class MyFormField extends StatelessWidget {
   const MyFormField({
     this.controller,
-    this.focusNode,
     this.hintText,
     this.obscureText = false,
     this.validator,
@@ -13,7 +12,6 @@ class MyFormField extends StatelessWidget {
   });
 
   final TextEditingController? controller;
-  final FocusNode? focusNode;
   final String? hintText;
   final bool obscureText;
   final String? Function(String?)? validator;
@@ -42,7 +40,6 @@ class MyFormField extends StatelessWidget {
         errorText: errorText,
       ),
       controller: controller,
-      focusNode: focusNode,
       obscureText: obscureText,
       validator: validator,
       onSaved: onSaved,

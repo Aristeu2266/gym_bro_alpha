@@ -83,9 +83,11 @@ class _LoginPageState extends State<LoginPage> {
                                           Navigator.pushReplacementNamed(
                                               context, PageRoutes.root))
                                       .catchError((_) {
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
+                                    if (mounted) {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                    }
                                     Utils.showTextSnackbar(
                                       context,
                                       'Connection failed',

@@ -1,5 +1,5 @@
 class WorkoutModel {
-  final String id;
+  final int id;
   final String userId;
   final bool isActive;
   final int order;

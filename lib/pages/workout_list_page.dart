@@ -16,44 +16,44 @@ class WorkoutListPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Workouts',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
           ReorderableListView.builder(
             onReorder: (oldIndex, newIndex) {},
             itemCount: workoutList.workouts.length,
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
+            header: const Text(
+              'Workouts',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
             itemBuilder: (ctx, index) {
               return WorkoutListTile(
                 workoutList.workouts[index],
                 key: ValueKey(workoutList.workouts[index]),
               );
             },
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, PageRoutes.workout);
-                  },
-                  child: Text(
-                    '+ Add Workout',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onBackground,
-                      fontSize: 18,
-                      decoration: TextDecoration.underline,
+            footer: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, PageRoutes.workout);
+                    },
+                    child: Text(
+                      '+ Add Workout',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onBackground,
+                        fontSize: 18,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
