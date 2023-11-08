@@ -85,7 +85,10 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
       }
     } catch (_) {
       AuthService.signOut().then((_) {
-        Navigator.pushReplacementNamed(context, PageRoutes.root);
+        Navigator.popUntil(
+          context,
+          (route) => route.isFirst,
+        );
       });
 
       if (context.mounted) {

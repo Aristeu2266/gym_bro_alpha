@@ -1,7 +1,10 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/models/workout_list_model.dart';
 import 'package:gym_bro_alpha/pages/workout_list_page.dart';
 import 'package:gym_bro_alpha/pages/start_page.dart';
+import 'package:gym_bro_alpha/services/store.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -17,13 +20,31 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int screenIndex = ScreenSelected.start.value;
   late PageController pageController;
+  late WorkoutListModel workoutListModel =
+      Provider.of<WorkoutListModel>(context, listen: false);
 
   @override
   void initState() {
     super.initState();
+
     pageController = PageController(initialPage: screenIndex);
+    _init();
+  }
+
+  Future<void> _init() async {
+    if (FirebaseAuth.instance.currentUser != null) {
+      if (await Store.firstTimeUser) {
+        await Store.loadUserData();
+      }
+      Connectivity().onConnectivityChanged.listen((result) {
+        if (result != ConnectivityResult.none) {
+          Store.uploadMissing();
+        }
+      });
+    }
+
     widget.refreshTheme(true);
-    Provider.of<WorkoutListModel>(context, listen: false).load();
+    await workoutListModel.load();
   }
 
   @override

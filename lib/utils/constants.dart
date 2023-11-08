@@ -25,3 +25,8 @@ class TableNames {
   static const workouts = 'workouts';
   static const toBeUploaded = 'to_be_uploaded';
 }
+
+class CollectionNames {
+  static const users = 'users';
+  static const workouts = 'workouts';
+}

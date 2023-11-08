@@ -10,13 +10,18 @@ class DB {
   static Database? _database;
 
   Future<Database> get database async {
-    // await deleteDatabase(join(await getDatabasesPath(), 'gymbro.db'));
     if (_database != null) return _database!;
 
     return await _initDatabase();
   }
 
+  static recreate() async {
+    await deleteDatabase(join(await getDatabasesPath(), 'gymbro.db'));
+    print('criado base de novo');
+  }
+
   _initDatabase() async {
+    // _recreate();
     return await openDatabase(
       join(await getDatabasesPath(), 'gymbro.db'),
       version: 1,
@@ -25,8 +30,12 @@ class DB {
   }
 
   _onCreate(Database db, int versao) async {
-    // print('criado base de novo');
     await db.execute(_userPrefsTable);
+    await db.insert(TableNames.userPrefs, {
+      'uId': 'null',
+      'theme': 2,
+      'lastLogin': DateTime.now().toIso8601String(),
+    });
     await db.execute(_workoutsTable);
     await db.execute(_toBeUploaded);
   }
@@ -56,6 +65,7 @@ class DB {
       origin TEXT NOT NULL,
       id INTEGER NOT NULL,
       uid TEXT NOT NULL,
+      extra INTEGER,
       PRIMARY KEY (origin, id, uid)
     );
   ''';

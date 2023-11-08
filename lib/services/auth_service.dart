@@ -5,9 +5,9 @@ import 'package:gym_bro_alpha/services/store.dart';
 class AuthService {
   static final _auth = FirebaseAuth.instance;
 
-  static Future<UserCredential> signIn(String email, String password) {
+  static Future<UserCredential> signIn(String email, String password) async {
     if (_auth.currentUser != null) {
-      AuthService.signOut();
+      await AuthService.signOut();
     }
 
     return _auth.signInWithEmailAndPassword(
@@ -25,7 +25,11 @@ class AuthService {
     );
   }
 
-  static Future<void> signOut() {
+  static Future<void> signOut() async {
+    if (await GoogleSignIn().isSignedIn()) {
+      await GoogleSignIn().disconnect();
+      print('desconectadodesconectadodesconectadodesconectado');
+    }
     return _auth.signOut();
   }
 

@@ -53,6 +53,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> loadTheme([bool? uid]) async {
     db = await DB.instance.database;
+
     var result = await db.query(
       TableNames.userPrefs,
       where: 'uid = ?',
@@ -68,6 +69,9 @@ class _MyAppState extends State<MyApp> {
         themeSelected = result[0]['theme'] as int;
       });
     } else {
+      setState(() {
+        themeSelected = 2;
+      });
       await db.insert(
         TableNames.userPrefs,
         {
@@ -77,9 +81,6 @@ class _MyAppState extends State<MyApp> {
         },
       ).catchError((_) {
         return 0;
-      });
-      setState(() {
-        themeSelected = 2;
       });
     }
   }

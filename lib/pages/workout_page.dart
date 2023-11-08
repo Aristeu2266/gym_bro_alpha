@@ -57,14 +57,13 @@ class _WorkoutPageState extends State<WorkoutPage> {
             onSaved: (name) {
               setState(() {
                 workoutName = name;
-                //workout = WorkoutModel(id: id, userid: userid, isActive: isActive, order: order, name: name)
               });
               workoutList.addWorkout(name!);
             },
             validator: (name) {
               if (name == null || name.isEmpty) {
                 return 'Insert a name';
-              } else if (name.length > 100) {
+              } else if (name.length > 30) {
                 return 'Name too big';
               }
               return null;
