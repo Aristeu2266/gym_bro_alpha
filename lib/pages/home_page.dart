@@ -70,11 +70,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   void handleScreenChanged(int screenSelected) {
-    pageController.animateToPage(screenSelected,
-        duration: const Duration(milliseconds: 1), curve: Curves.ease);
-    setState(() {
-      screenIndex = screenSelected;
-    });
+    if (screenSelected != screenIndex) {
+      pageController.animateToPage(screenSelected,
+          duration: const Duration(milliseconds: 1), curve: Curves.ease);
+      setState(() {
+        screenIndex = screenSelected;
+      });
+    } else if (screenSelected == 2) {
+      Navigator.pushNamed(context, PageRoutes.workout);
+    }
   }
 
   @override

@@ -137,12 +137,6 @@ class _MyAppState extends State<MyApp> {
               handleThemeSelect: handleThemeSelect),
           PageRoutes.workout: (ctx) => const WorkoutPage(),
         },
-        // onGenerateRoute: (settings) {
-        //   Map<String, WidgetBuilder> routes = {
-        //     PageRoutes.workout: (ctx) => WorkoutPage(),
-        //   };
-        //   WidgetBuilder builder = routes
-        // },
       ),
     );
   }

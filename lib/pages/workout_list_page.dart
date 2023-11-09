@@ -31,9 +31,12 @@ class WorkoutListPage extends StatelessWidget {
                 ),
               ),
               itemBuilder: (ctx, index) {
-                return WorkoutListTile(
-                  workoutList.workouts[index],
+                return ChangeNotifierProvider.value(
                   key: ValueKey(workoutList.workouts[index]),
+                  value: workoutList.workouts[index],
+                  child: WorkoutListTile(
+                    workoutList.workouts[index],
+                  ),
                 );
               },
             ),

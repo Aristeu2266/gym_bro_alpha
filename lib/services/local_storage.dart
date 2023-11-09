@@ -21,7 +21,6 @@ class DB {
   }
 
   _initDatabase() async {
-    // _recreate();
     return await openDatabase(
       join(await getDatabasesPath(), 'gymbro.db'),
       version: 1,
@@ -32,9 +31,9 @@ class DB {
   _onCreate(Database db, int versao) async {
     await db.execute(_userPrefsTable);
     await db.insert(TableNames.userPrefs, {
-      'uId': 'null',
+      'uid': 'null',
       'theme': 2,
-      'lastLogin': DateTime.now().toIso8601String(),
+      'lastlogin': DateTime.now().toIso8601String(),
     });
     await db.execute(_workoutsTable);
     await db.execute(_toBeUploaded);
@@ -44,16 +43,16 @@ class DB {
     CREATE TABLE ${TableNames.userPrefs} (
       uid TEXT PRIMARY KEY,
       theme INTEGER,
-      lastLogin DATETIME NOT NULL
+      lastlogin DATETIME NOT NULL
     );
   ''';
 
   String get _workoutsTable => '''
     CREATE TABLE ${TableNames.workouts} (
       id INTEGER NOT NULL,
-      uId TEXT NOT NULL,
-      isActive BOOLEAN NOT NULL,
-      sortOrder INTEGER NOT NULL,
+      uid TEXT NOT NULL,
+      isactive BOOLEAN NOT NULL,
+      sortorder INTEGER NOT NULL,
       name TEXT NOT NULL,
       creation DATETIME NOT NULL,
       PRIMARY KEY (id, uId)
@@ -63,10 +62,11 @@ class DB {
   String get _toBeUploaded => '''
     CREATE TABLE ${TableNames.toBeUploaded} (
       origin TEXT NOT NULL,
+      operation TEXT NOT NULL,
       id INTEGER NOT NULL,
       uid TEXT NOT NULL,
-      extra INTEGER,
-      PRIMARY KEY (origin, id, uid)
+      extra INTEGER NOT NULL,
+      UNIQUE(origin, operation, id, uid, extra)
     );
   ''';
 }

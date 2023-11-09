@@ -28,7 +28,6 @@ class AuthService {
   static Future<void> signOut() async {
     if (await GoogleSignIn().isSignedIn()) {
       await GoogleSignIn().disconnect();
-      print('desconectadodesconectadodesconectadodesconectado');
     }
     return _auth.signOut();
   }

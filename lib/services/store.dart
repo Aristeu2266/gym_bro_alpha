@@ -15,7 +15,7 @@ class Store {
 
     return await db.query(
       TableNames.workouts,
-      where: 'uId = ?',
+      where: 'uid = ?',
       whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
     );
   }
@@ -25,15 +25,15 @@ class Store {
 
     final mostRecent = await db.query(
       TableNames.userPrefs,
-      columns: ['MAX(lastLogin) AS lastLogin'],
+      columns: ['MAX(lastlogin) AS lastlogin'],
     );
 
     final row = await db.query(TableNames.userPrefs,
-        columns: ['uId'],
-        where: 'lastLogin = ?',
+        columns: ['uid'],
+        where: 'lastlogin = ?',
         whereArgs: [
           (mostRecent.isNotEmpty
-              ? mostRecent[0]['lastLogin'] ?? 'null'
+              ? mostRecent[0]['lastlogin'] ?? 'null'
               : 'null') as String
         ]);
 
@@ -81,9 +81,9 @@ class Store {
     return db.update(
       TableNames.userPrefs,
       {
-        'lastLogin': DateTime.now().toIso8601String(),
+        'lastlogin': DateTime.now().toIso8601String(),
       },
-      where: 'uId = ?',
+      where: 'uid = ?',
       whereArgs: [uid],
     );
   }
@@ -93,17 +93,17 @@ class Store {
 
     List<Map<String, Object?>> idNSort = await db.query(
       TableNames.workouts,
-      columns: ['MAX(id)+1 AS id', 'COUNT(id)+1 as sortOrder'],
-      where: 'uId = ?',
+      columns: ['MAX(id)+1 AS id', 'COUNT(id)+1 as sortorder'],
+      where: 'uid = ?',
       whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
-      groupBy: 'uId',
+      groupBy: 'uid',
     );
 
     WorkoutModel workout = WorkoutModel(
       id: idNSort.isNotEmpty ? idNSort[0]['id'] as int : 1,
       uId: FirebaseAuth.instance.currentUser?.uid ?? 'null',
       isActive: true,
-      sortOrder: idNSort.isNotEmpty ? idNSort[0]['sortOrder'] as int : 1,
+      sortOrder: idNSort.isNotEmpty ? idNSort[0]['sortorder'] as int : 1,
       name: name,
       creation: DateTime.now(),
     );
@@ -116,16 +116,20 @@ class Store {
     final connectivity = await Connectivity().checkConnectivity();
     if (FirebaseAuth.instance.currentUser != null) {
       if (connectivity != ConnectivityResult.none) {
-        _workoutToCloud(workout);
+        _workoutCloudSet(workout);
       } else {
-        _toBeUploaded(TableNames.workouts, workout);
+        _toBeUploaded(
+          tableName: TableNames.workouts,
+          object: workout,
+          operation: 'insert',
+        );
       }
     }
 
     return workout;
   }
 
-  static Future<void> _workoutToCloud(WorkoutModel workout) async {
+  static Future<void> _workoutCloudSet(WorkoutModel workout) async {
     final workoutCol = FirebaseFirestore.instance
         .collection(CollectionNames.users)
         .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -137,14 +141,51 @@ class Store {
     );
   }
 
-  static Future<int> _toBeUploaded(String tableName, DBObject object) async {
+  static Future<void> updateWorkout(WorkoutModel workout) async {
+    db = await DB.instance.database;
+
+    db.update(
+      TableNames.workouts,
+      workout.toMap(),
+      where: 'id = ? and uid = ?',
+      whereArgs: [workout.id, workout.uId],
+    );
+
+    final connectivity = await Connectivity().checkConnectivity();
+    if (FirebaseAuth.instance.currentUser != null) {
+      if (connectivity != ConnectivityResult.none) {
+        _workoutCloudUpdate(workout);
+      } else {
+        _toBeUploaded(
+          tableName: TableNames.workouts,
+          object: workout,
+          operation: 'insert',
+        );
+      }
+    }
+  }
+
+  static Future<void> _workoutCloudUpdate(WorkoutModel workout) async {
+    return _workoutCloudSet(workout);
+  }
+
+  static Future<int> _toBeUploaded({
+    required String tableName,
+    required DBObject object,
+    required String operation,
+  }) async {
     db = await DB.instance.database;
 
     Map<String, Object?> data = {
       'origin': tableName,
+      'operation': operation,
     }..addAll(object.primaryKeys());
 
-    return db.insert(TableNames.toBeUploaded, data);
+    return db.insert(
+      TableNames.toBeUploaded,
+      data,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   static Future<void> uploadMissing() async {
@@ -157,7 +198,7 @@ class Store {
     );
 
     for (Map<String, Object?> row in toBeUploaded) {
-      DBObject dbObject;
+      late DBObject dbObject;
 
       if (row['origin'] == 'workouts') {
         dbObject = WorkoutModel.mapToModel(
@@ -167,23 +208,37 @@ class Store {
             whereArgs: [row['id'], row['uid']],
           ))[0],
         );
-
-        _workoutToCloud(dbObject as WorkoutModel).then((_) {
-          db.delete(
-            TableNames.toBeUploaded,
-            where: 'origin = ? AND id = ? AND uid = ?',
-            whereArgs: [row['origin'], row['id'], row['uid']],
-          );
-        });
       } else {
         // TODO: need to sendo info to cloud and delete from local.
         // But, there is only workout to work with so far.
-        dbObject = WorkoutModel.mapToModel(
-          (await db.query(
-            row['origin'] as String,
-            where: 'id = ? AND uid = ? AND workoutid = ?',
-            whereArgs: [row['id'], row['uid'], row['extra']],
-          ))[0],
+
+        // dbObject = TrainingModel.mapToModel(
+        //   (await db.query(
+        //     row['origin'] as String,
+        //     where: 'id = ? AND uid = ? AND workoutid = ?',
+        //     whereArgs: [row['id'], row['uid'], row['extra']],
+        //   ))[0],
+        // );
+      }
+
+      bool success = false;
+      switch (row['operation']) {
+        case 'insert':
+          if (dbObject is WorkoutModel) {
+            _workoutCloudSet(dbObject).then((_) {
+              success = true;
+            });
+          }
+          break;
+        case 'update':
+          break;
+      }
+
+      if (success) {
+        db.delete(
+          TableNames.toBeUploaded,
+          where: 'primarykey = ?',
+          whereArgs: [row['primarykey']],
         );
       }
     }

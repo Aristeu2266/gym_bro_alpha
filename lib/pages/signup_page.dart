@@ -89,10 +89,7 @@ class _SignupPageState extends State<SignupPage>
           Expanded(
             flex: 1,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(25, 0, 25, 10
-                  // vertical: 25,
-                  // horizontal: 25,
-                  ),
+              padding: const EdgeInsets.fromLTRB(25, 0, 25, 10),
               child: Column(
                 children: [
                   const Spacer(flex: 1),
@@ -146,19 +143,19 @@ class _SignupPageState extends State<SignupPage>
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    await AuthService.signInWithGoogle()
-                                        // ignore: body_might_complete_normally_catch_error
-                                        .catchError((_) {
+                                    try {
+                                      await AuthService.signInWithGoogle();
+                                    } catch (e) {
                                       if (mounted) {
                                         setState(() {
                                           _isLoading = false;
                                         });
+                                        Utils.showTextSnackbar(
+                                          context,
+                                          'Connection failed',
+                                        );
                                       }
-                                      Utils.showTextSnackbar(
-                                        context,
-                                        'Connection failed',
-                                      );
-                                    });
+                                    }
                                   },
                                   style: ElevatedButton.styleFrom(
                                       backgroundColor:

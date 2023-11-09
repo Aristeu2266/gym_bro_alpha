@@ -79,19 +79,19 @@ class _LoginPageState extends State<LoginPage> {
                                   setState(() {
                                     _isLoading = true;
                                   });
-                                  await AuthService.signInWithGoogle()
-                                      // ignore: body_might_complete_normally_catch_error
-                                      .catchError((_) {
+                                  try {
+                                    await AuthService.signInWithGoogle();
+                                  } catch (e) {
                                     if (mounted) {
                                       setState(() {
                                         _isLoading = false;
                                       });
+                                      Utils.showTextSnackbar(
+                                        context,
+                                        'Connection failed',
+                                      );
                                     }
-                                    Utils.showTextSnackbar(
-                                      context,
-                                      'Connection failed',
-                                    );
-                                  });
+                                  }
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: colorScheme.primaryContainer,

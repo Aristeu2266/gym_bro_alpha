@@ -15,9 +15,11 @@ class WorkoutListModel with ChangeNotifier {
         .toList();
   }
 
-  Future<void> addWorkout(String workoutName) async {
-    workouts.add(await Store.newWorkout(workoutName));
+  Future<WorkoutModel> addWorkout(String workoutName) async {
+    final WorkoutModel workout = await Store.newWorkout(workoutName);
+    workouts.add(workout);
 
     notifyListeners();
+    return workout;
   }
 }
