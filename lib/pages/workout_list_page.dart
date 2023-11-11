@@ -11,56 +11,60 @@ class WorkoutListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final workoutList = Provider.of<WorkoutListModel>(context);
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ReorderableListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              onReorder: (oldIndex, newIndex) {},
-              itemCount: workoutList.workouts.length,
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              header: const Text(
-                'Workouts',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              itemBuilder: (ctx, index) {
-                return ChangeNotifierProvider.value(
-                  key: ValueKey(workoutList.workouts[index]),
-                  value: workoutList.workouts[index],
-                  child: WorkoutListTile(
-                    workoutList.workouts[index],
+    return RefreshIndicator(
+      // TODO: fazer um método para sincronizar os dados com a núvem
+      onRefresh: () async {},
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ReorderableListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                onReorder: (oldIndex, newIndex) {},
+                itemCount: workoutList.workouts.length,
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                header: const Text(
+                  'Workouts',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
                   ),
-                );
-              },
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, PageRoutes.workout);
-                    },
-                    child: Text(
-                      '+ Add Workout',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onBackground,
-                        fontSize: 18,
-                        decoration: TextDecoration.underline,
+                ),
+                itemBuilder: (ctx, index) {
+                  return ChangeNotifierProvider.value(
+                    key: ValueKey(workoutList.workouts[index]),
+                    value: workoutList.workouts[index],
+                    child: WorkoutListTile(
+                      workoutList.workouts[index],
+                    ),
+                  );
+                },
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, PageRoutes.workout);
+                      },
+                      child: Text(
+                        '+ Add Workout',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onBackground,
+                          fontSize: 18,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

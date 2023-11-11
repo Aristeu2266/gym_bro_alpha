@@ -1,8 +1,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gym_bro_alpha/models/workout_list_model.dart';
-import 'package:gym_bro_alpha/pages/workout_list_page.dart';
+import 'package:gym_bro_alpha/models/routine_list_model.dart';
+import 'package:gym_bro_alpha/pages/routine_list_page.dart';
 import 'package:gym_bro_alpha/pages/start_page.dart';
 import 'package:gym_bro_alpha/services/store.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
@@ -20,8 +20,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int screenIndex = ScreenSelected.start.value;
   late PageController pageController;
-  late WorkoutListModel workoutListModel =
-      Provider.of<WorkoutListModel>(context, listen: false);
+  late RoutineListModel routineListModel =
+      Provider.of<RoutineListModel>(context, listen: false);
 
   @override
   void initState() {
@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     widget.refreshTheme(true);
-    await workoutListModel.load();
+    await routineListModel.load();
   }
 
   @override
@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  PreferredSizeWidget appBar() {
+  PreferredSizeWidget _appBar() {
     return AppBar(
       title: const Text('GymBro'),
       centerTitle: true,
@@ -70,21 +70,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   void handleScreenChanged(int screenSelected) {
-    if (screenSelected != screenIndex) {
-      pageController.animateToPage(screenSelected,
-          duration: const Duration(milliseconds: 1), curve: Curves.ease);
-      setState(() {
-        screenIndex = screenSelected;
-      });
-    } else if (screenSelected == 2) {
-      Navigator.pushNamed(context, PageRoutes.workout);
-    }
+    pageController.animateToPage(screenSelected,
+        duration: const Duration(milliseconds: 1), curve: Curves.ease);
+    setState(() {
+      screenIndex = screenSelected;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(),
+      appBar: _appBar(),
       body: PageView(
         controller: pageController,
         onPageChanged: (value) => setState(() => screenIndex = value),
@@ -100,7 +96,8 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const StartPage(),
-          const WorkoutListPage(),
+          //const WorkoutListPage(),
+          const RoutineListPage(),
         ],
       ),
       extendBody: false,

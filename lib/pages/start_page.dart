@@ -32,7 +32,8 @@ class _StartPageState extends State<StartPage> {
           ConstrainedBox(
             constraints: BoxConstraints(
               minWidth: double.infinity,
-              maxHeight: (constraints.maxHeight - buttonSize(constraints).height)/2,
+              maxHeight:
+                  (constraints.maxHeight - buttonSize(constraints).height) / 2,
             ),
             child: const Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -52,8 +53,7 @@ class _StartPageState extends State<StartPage> {
               style: IconButton.styleFrom(
                 foregroundColor:
                     Theme.of(context).colorScheme.onPrimaryContainer,
-                backgroundColor:
-                    Theme.of(context).colorScheme.primaryContainer,
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                 minimumSize: buttonSize(constraints),
               ),
               onPressed: () {},

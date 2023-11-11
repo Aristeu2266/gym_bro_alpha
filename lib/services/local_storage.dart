@@ -35,6 +35,7 @@ class DB {
       'theme': 2,
       'lastlogin': DateTime.now().toIso8601String(),
     });
+    await db.execute(_routinesTable);
     await db.execute(_workoutsTable);
     await db.execute(_toBeUploaded);
   }
@@ -47,15 +48,27 @@ class DB {
     );
   ''';
 
+  String get _routinesTable => '''
+    CREATE TABLE routines (
+      id INTEGER NOT NULL,
+      uid TEXT NOT NULL,
+      name TEXT NOT NULL,
+      sortorder INTEGER NOT NULL,
+      description TEXT NULL,
+      PRIMARY KEY (id, uid)
+    );
+  ''';
+
   String get _workoutsTable => '''
     CREATE TABLE ${TableNames.workouts} (
       id INTEGER NOT NULL,
       uid TEXT NOT NULL,
+      routineid INTEGER NOT NULL,
       isactive BOOLEAN NOT NULL,
       sortorder INTEGER NOT NULL,
       name TEXT NOT NULL,
       creation DATETIME NOT NULL,
-      PRIMARY KEY (id, uId)
+      PRIMARY KEY (id, uId, routineid)
     );
   ''';
 

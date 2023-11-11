@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 class WorkoutListTile extends StatefulWidget {
   const WorkoutListTile(this.workout, {super.key});
 
+  // TODO: não está sendo usado
   final WorkoutModel workout;
 
   @override

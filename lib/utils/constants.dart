@@ -22,11 +22,13 @@ class PageRoutes {
 
 class TableNames {
   static const userPrefs = 'user_prefs';
+  static const routines = 'routines';
   static const workouts = 'workouts';
   static const toBeUploaded = 'to_be_uploaded';
 }
 
 class CollectionNames {
   static const users = 'users';
+  static const routines = 'routines';
   static const workouts = 'workouts';
 }

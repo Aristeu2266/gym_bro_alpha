@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gym_bro_alpha/models/db_object.dart';
+import 'package:gym_bro_alpha/models/routine_model.dart';
 import 'package:gym_bro_alpha/models/workout_model.dart';
 import 'package:gym_bro_alpha/services/local_storage.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
@@ -10,11 +11,11 @@ import 'package:sqflite/sqflite.dart';
 class Store {
   static late Database db;
 
-  static Future<List<Map<String, Object?>>> get userWorkouts async {
+  static Future<List<Map<String, Object?>>> get userRoutines async {
     db = await DB.instance.database;
 
     return await db.query(
-      TableNames.workouts,
+      TableNames.routines,
       where: 'uid = ?',
       whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
     );
@@ -65,10 +66,13 @@ class Store {
   static Future<void> _loadUserWorkouts(DocumentReference userDoc) async {
     db = await DB.instance.database;
 
-    final workouts = (await userDoc.collection(CollectionNames.workouts).get())
-        .docs
-        .map((doc) => doc.data())
-        .toList();
+    final workoutsDocs =
+        (await userDoc.collection(CollectionNames.workouts).get()).docs
+          ..removeWhere((doc) => doc.id == 'sortOrder');
+    final workouts = workoutsDocs.map((doc) => doc.data()).toList();
+    workouts.sort((a, b) {
+      return a['sortOrder'] - b['sortOrder'];
+    });
 
     for (Map<String, dynamic> workout in workouts) {
       await db.insert(TableNames.workouts, workout);
@@ -88,7 +92,94 @@ class Store {
     );
   }
 
-  static Future<WorkoutModel> newWorkout(String name) async {
+  static Future<RoutineModel> newRoutine(
+      String name, String? description) async {
+    db = await DB.instance.database;
+
+    List<Map<String, Object?>> idNSort = (await db.query(
+      TableNames.routines,
+      columns: ['MAX(id)+1 AS id', 'COUNT(sortorder)+1 as sortorder'],
+      where: 'uid = ?',
+      whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
+      groupBy: 'uid',
+    ));
+
+    RoutineModel routine = RoutineModel(
+      id: idNSort.isNotEmpty ? idNSort[0]['id'] as int : 1,
+      uid: FirebaseAuth.instance.currentUser?.uid ?? 'null',
+      name: name,
+      sortOrder: idNSort.isNotEmpty ? idNSort[0]['sortorder'] as int : 1,
+      description: description,
+    );
+
+    db.insert(
+      TableNames.routines,
+      routine.toMap(),
+    );
+
+    final connectivity = await Connectivity().checkConnectivity();
+
+    if (FirebaseAuth.instance.currentUser != null) {
+      if (connectivity != ConnectivityResult.none) {
+        _routineCloudSet(routine);
+      } else {
+        _toBeUploaded(
+          tableName: TableNames.routines,
+          object: routine,
+          operation: 'insert',
+        );
+      }
+    }
+
+    return routine;
+  }
+
+  static Future<void> _routineCloudSet(RoutineModel routine,
+      [SetOptions? setOptions]) async {
+    final workoutCol = FirebaseFirestore.instance
+        .collection(CollectionNames.users)
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection(CollectionNames.routines);
+    final workoutDoc = workoutCol.doc('${routine.id}');
+
+    return workoutDoc.set(
+      routine.toMap(),
+      setOptions,
+    );
+  }
+
+  static Future<void> updateRoutine(RoutineModel routine) async {
+    db = await DB.instance.database;
+
+    db.update(
+      TableNames.routines,
+      routine.toMap(),
+      where: 'id = ? AND uid = ?',
+      whereArgs: [routine.id, routine.uid],
+    );
+
+    final connectivity = await Connectivity().checkConnectivity();
+    if (FirebaseAuth.instance.currentUser != null) {
+      if (connectivity != ConnectivityResult.none) {
+        _routineCloudUpdate(routine);
+      } else {
+        _toBeUploaded(
+          tableName: TableNames.routines,
+          object: routine,
+          operation: 'insert',
+        );
+      }
+    }
+  }
+
+  static Future<void> _routineCloudUpdate(RoutineModel routine) async {
+    return _routineCloudSet(
+      routine,
+      SetOptions(merge: true),
+    );
+  }
+
+  static Future<WorkoutModel> newWorkout(String name, int routineId) async {
     db = await DB.instance.database;
 
     List<Map<String, Object?>> idNSort = await db.query(
@@ -102,6 +193,7 @@ class Store {
     WorkoutModel workout = WorkoutModel(
       id: idNSort.isNotEmpty ? idNSort[0]['id'] as int : 1,
       uId: FirebaseAuth.instance.currentUser?.uid ?? 'null',
+      routineId: routineId,
       isActive: true,
       sortOrder: idNSort.isNotEmpty ? idNSort[0]['sortorder'] as int : 1,
       name: name,
@@ -114,6 +206,7 @@ class Store {
     );
 
     final connectivity = await Connectivity().checkConnectivity();
+
     if (FirebaseAuth.instance.currentUser != null) {
       if (connectivity != ConnectivityResult.none) {
         _workoutCloudSet(workout);
@@ -129,7 +222,8 @@ class Store {
     return workout;
   }
 
-  static Future<void> _workoutCloudSet(WorkoutModel workout) async {
+  static Future<void> _workoutCloudSet(WorkoutModel workout,
+      [SetOptions? setOptions]) async {
     final workoutCol = FirebaseFirestore.instance
         .collection(CollectionNames.users)
         .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -138,6 +232,7 @@ class Store {
 
     return workoutDoc.set(
       workout.toMap(),
+      setOptions,
     );
   }
 
@@ -147,8 +242,8 @@ class Store {
     db.update(
       TableNames.workouts,
       workout.toMap(),
-      where: 'id = ? and uid = ?',
-      whereArgs: [workout.id, workout.uId],
+      where: 'id = ? and uid = ? and routineid = ?',
+      whereArgs: [workout.id, workout.uId, workout.routineId],
     );
 
     final connectivity = await Connectivity().checkConnectivity();
@@ -166,7 +261,10 @@ class Store {
   }
 
   static Future<void> _workoutCloudUpdate(WorkoutModel workout) async {
-    return _workoutCloudSet(workout);
+    return _workoutCloudSet(
+      workout,
+      SetOptions(merge: true),
+    );
   }
 
   static Future<int> _toBeUploaded({
@@ -200,37 +298,37 @@ class Store {
     for (Map<String, Object?> row in toBeUploaded) {
       late DBObject dbObject;
 
-      if (row['origin'] == 'workouts') {
-        dbObject = WorkoutModel.mapToModel(
-          (await db.query(
-            row['origin'] as String,
-            where: 'id = ? AND uid = ?',
-            whereArgs: [row['id'], row['uid']],
-          ))[0],
-        );
-      } else {
-        // TODO: need to sendo info to cloud and delete from local.
-        // But, there is only workout to work with so far.
-
-        // dbObject = TrainingModel.mapToModel(
-        //   (await db.query(
-        //     row['origin'] as String,
-        //     where: 'id = ? AND uid = ? AND workoutid = ?',
-        //     whereArgs: [row['id'], row['uid'], row['extra']],
-        //   ))[0],
-        // );
+      switch (row['origin']) {
+        case TableNames.routines:
+          dbObject = RoutineModel.mapToModel(
+            (await db.query(
+              TableNames.routines,
+              where: 'id = ? AND uid = ?',
+              whereArgs: [row['id'], row['uid']],
+            ))[0],
+          );
+          break;
+        case TableNames.workouts:
+          dbObject = WorkoutModel.mapToModel(
+            (await db.query(
+              TableNames.workouts,
+              where: 'id = ? AND uid = ? AND routineid = ?',
+              whereArgs: [row['id'], row['uid'], row['extra']],
+            ))[0],
+          );
+          break;
       }
 
       bool success = false;
       switch (row['operation']) {
         case 'insert':
-          if (dbObject is WorkoutModel) {
-            _workoutCloudSet(dbObject).then((_) {
-              success = true;
-            });
+          if (dbObject is RoutineModel) {
+            _routineCloudSet(dbObject).then((_) => success = true);
+          } else if (dbObject is WorkoutModel) {
+            _workoutCloudSet(dbObject).then((_) => success = true);
           }
           break;
-        case 'update':
+        case 'delete':
           break;
       }
 

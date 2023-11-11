@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gym_bro_alpha/models/workout_list_model.dart';
+import 'package:gym_bro_alpha/models/routine_list_model.dart';
 import 'package:gym_bro_alpha/services/local_storage.dart';
 import 'package:gym_bro_alpha/pages/auth_page.dart';
 import 'package:gym_bro_alpha/pages/home_page.dart';
@@ -104,7 +104,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => WorkoutListModel(),
+      create: (_) => RoutineListModel(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Gym Bro Alpha',

@@ -5,8 +5,9 @@ import 'package:gym_bro_alpha/services/store.dart';
 class WorkoutModel extends DBObject with ChangeNotifier {
   final int id;
   final String uId;
+  final int routineId;
   bool isActive;
-  int sortOrder;
+  late int _sortOrder;
   late String _name;
   final DateTime creation;
   List exercises = [];
@@ -15,12 +16,18 @@ class WorkoutModel extends DBObject with ChangeNotifier {
   WorkoutModel({
     required this.id,
     required this.uId,
+    required this.routineId,
     required this.isActive,
-    required this.sortOrder,
+    required sortOrder,
     required name,
     required this.creation,
   }) {
     _name = name;
+    _sortOrder = sortOrder;
+  }
+
+  String get name {
+    return _name;
   }
 
   set name(String s) {
@@ -30,16 +37,24 @@ class WorkoutModel extends DBObject with ChangeNotifier {
     notifyListeners();
   }
 
-  String get name {
-    return _name;
+  int get sortOrder {
+    return _sortOrder;
+  }
+
+  set sortOrder(int newOrder) {
+    assert(newOrder > 0);
+    _sortOrder = newOrder;
+    Store.updateWorkout(this);
+    notifyListeners();
   }
 
   Map<String, Object> toMap() {
     return {
       'id': id,
       'uId': uId,
+      'routineId': routineId,
       'isActive': isActive ? 1 : 0,
-      'sortOrder': sortOrder,
+      'sortOrder': _sortOrder,
       'name': _name,
       'creation': creation.toIso8601String(),
     };
@@ -49,6 +64,7 @@ class WorkoutModel extends DBObject with ChangeNotifier {
     return WorkoutModel(
       id: map['id'] as int,
       uId: map['uid'] as String,
+      routineId: map['routineId'] as int,
       isActive: (map['isactive'] as int) == 1 ? true : false,
       sortOrder: map['sortorder'] as int,
       name: map['name'] as String,
@@ -61,7 +77,7 @@ class WorkoutModel extends DBObject with ChangeNotifier {
     return {
       'id': id,
       'uid': uId,
-      'extra': 0,
+      'extra': routineId,
     };
   }
 }

@@ -28,11 +28,6 @@ class _WorkoutPageState extends State<WorkoutPage> {
     _formFieldKey = GlobalKey<FormFieldState>();
     _titleController = TextEditingController();
     _titleFocus = FocusNode();
-    // _title!.addListener(() {
-    //   setState(() {
-    //     teste = _title!.text.isNotEmpty ? _title!.text.length * 15 : 1;
-    //   });
-    // });
     WidgetsBinding.instance.addPostFrameCallback(
       (_) async {
         if (workout == null) {
@@ -81,7 +76,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 hintText: 'Leg day; Back and Bi; Push...'),
             autofocus: true,
             onSaved: (name) async {
-              workout = await workoutList.addWorkout(name!);
+              // workout = await workoutList.add(name!);
               if (workout != null && mounted) {
                 Navigator.pop(context);
               }
@@ -135,71 +130,75 @@ class _WorkoutPageState extends State<WorkoutPage> {
     });
   }
 
+  PreferredSizeWidget _appBar() {
+    return AppBar(
+      centerTitle: true,
+      title: _isEditingTitle
+          ? AnimatedContainer(
+              duration: const Duration(milliseconds: 60),
+              width: double.parse('$_titleWidth'),
+              alignment: Alignment.center,
+              child: TextField(
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                maxLength: _titleMaxLength,
+                style: const TextStyle(
+                  fontSize: 21,
+                  fontFamily: 'Roboto-Regular',
+                ),
+                decoration: const InputDecoration(
+                  counterText: '',
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.only(bottom: 4, left: 3),
+                ),
+                controller: _titleController,
+                focusNode: _titleFocus,
+                onChanged: (value) {
+                  setState(() {
+                    oto = oto == Colors.red ? Colors.orange : Colors.red;
+                    _updateTitleWidth();
+                  });
+                },
+              ),
+            )
+          : FittedBox(
+              fit: BoxFit.cover,
+              child: Text(
+                workout?.name ?? ' ',
+                style: const TextStyle(
+                  fontSize: 21,
+                  fontFamily: 'Roboto-Regular',
+                ),
+              ),
+            ),
+      actions: [
+        IconButton(
+          onPressed: () {
+            setState(() {
+              _isEditingTitle = !_isEditingTitle;
+              if (!_isEditingTitle) {
+                if (_titleController!.text.isNotEmpty) {
+                  workout!.name = _titleController!.text;
+                } else {
+                  _titleController!.text = workout!.name;
+                }
+              } else {
+                _titleFocus.requestFocus();
+              }
+            });
+          },
+          icon: _isEditingTitle
+              ? const Icon(Icons.save_outlined)
+              : const Icon(Icons.edit_outlined),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: _isEditingTitle
-            ? AnimatedContainer(
-                duration: const Duration(milliseconds: 60),
-                width: double.parse('$_titleWidth'),
-                alignment: Alignment.center,
-                child: TextField(
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  maxLength: _titleMaxLength,
-                  style: const TextStyle(
-                    fontSize: 21,
-                    fontFamily: 'Roboto-Regular',
-                  ),
-                  decoration: const InputDecoration(
-                    counterText: '',
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.only(bottom: 4, left: 3),
-                  ),
-                  controller: _titleController,
-                  focusNode: _titleFocus,
-                  onChanged: (value) {
-                    setState(() {
-                      oto = oto == Colors.red ? Colors.orange : Colors.red;
-                      _updateTitleWidth();
-                    });
-                  },
-                ),
-              )
-            : FittedBox(
-                fit: BoxFit.cover,
-                child: Text(
-                  workout?.name ?? ' ',
-                  style: const TextStyle(
-                    fontSize: 21,
-                    fontFamily: 'Roboto-Regular',
-                  ),
-                ),
-              ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _isEditingTitle = !_isEditingTitle;
-                if (!_isEditingTitle) {
-                  if (_titleController!.text.isNotEmpty) {
-                    workout!.name = _titleController!.text;
-                  } else {
-                    _titleController!.text = workout!.name;
-                  }
-                } else {
-                  _titleFocus.requestFocus();
-                }
-              });
-            },
-            icon: _isEditingTitle
-                ? const Icon(Icons.save_outlined)
-                : const Icon(Icons.edit_outlined),
-          ),
-        ],
-      ),
+      appBar: _appBar(),
       body: Container(
         color: oto,
       ),
