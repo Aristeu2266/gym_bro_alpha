@@ -92,7 +92,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
       });
 
       if (context.mounted) {
-        Utils.showTextSnackbar(context, 'Connection failed');
+        Utils.showSnackbar(context, 'Connection failed');
       }
     }
   }
@@ -106,7 +106,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
     await currentUser!.sendEmailVerification().catchError(
       (e) {
         if (mounted) {
-          Utils.showTextSnackbar(context, 'Too many attempts');
+          Utils.showSnackbar(context, 'Too many attempts');
         }
       },
     );

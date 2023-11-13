@@ -150,7 +150,7 @@ class _SignupPageState extends State<SignupPage>
                                         setState(() {
                                           _isLoading = false;
                                         });
-                                        Utils.showTextSnackbar(
+                                        Utils.showSnackbar(
                                           context,
                                           'Connection failed',
                                         );

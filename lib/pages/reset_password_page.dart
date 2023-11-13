@@ -34,7 +34,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           .then(
         (_) {
           Navigator.popUntil(context, (route) => route.isFirst);
-          Utils.showTextSnackbar(
+          Utils.showSnackbar(
             context,
             'Password reset email sent.',
           );
@@ -49,7 +49,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           firebaseException = 'Invalid email';
         });
       } else if (context.mounted) {
-        Utils.showTextSnackbar(
+        Utils.showSnackbar(
           context,
           'Connection failed',
         );

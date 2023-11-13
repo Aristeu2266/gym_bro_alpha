@@ -90,7 +90,7 @@ class _AuthFormState extends State<AuthForm>
       if (e.code != 'network-request-failed') {
         setState(() => validateException = AuthException(e.code));
       } else if (context.mounted) {
-        Utils.showTextSnackbar(context, 'Connection failed');
+        Utils.showSnackbar(context, 'Connection failed');
       }
     }
 

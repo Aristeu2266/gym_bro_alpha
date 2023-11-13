@@ -108,9 +108,22 @@ class Store {
         final localRoutine = (await localUserRoutines)
             .firstWhere((e) => routine['id'] == e['id']);
         if (DateTime.parse(routine['creationdate'])
+            .isAtSameMomentAs(DateTime.parse(localRoutine['creationdate']))) {
+          // _deleteCloudRoutine(routine['id']);
+          await db.update(
+            TableNames.routines,
+            routine,
+            where: 'id = ? AND uid = ?',
+            whereArgs: [routine['id'], routine['uid']],
+          );
+        } else if (DateTime.parse(routine['creationdate'])
             .isAfter(DateTime.parse(localRoutine['creationdate']))) {
-          _deleteCloudRoutine(routine['id']);
-          db.insert(TableNames.routines, routine);
+          await db.delete(
+            TableNames.routines,
+            where: 'id = ? AND uid = ?',
+            whereArgs: [routine['id'], routine['uid']],
+          );
+          await db.insert(TableNames.routines, routine);
         }
       } else {
         db.insert(TableNames.routines, routine);
@@ -135,19 +148,20 @@ class Store {
       String name, String? description) async {
     db = await DB.instance.database;
 
-    List<Map<String, Object?>> idNSort = (await db.query(
+    List<Map<String, Object?>> id = (await db.query(
       TableNames.routines,
-      columns: ['MAX(id)+1 AS id', 'COUNT(sortorder)+1 as sortorder'],
+      columns: ['MAX(id)+1 AS id'],
       where: 'uid = ?',
       whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
       groupBy: 'uid',
     ));
 
     RoutineModel routine = RoutineModel(
-      id: idNSort.isNotEmpty ? idNSort[0]['id'] as int : 1,
+      id: id.isNotEmpty ? id[0]['id'] as int : 1,
       uid: FirebaseAuth.instance.currentUser?.uid ?? 'null',
       name: name,
-      sortOrder: idNSort.isNotEmpty ? idNSort[0]['sortorder'] as int : 1,
+      isActive: true,
+      sortOrder: (await maxRoutineSortOrder(true)) + 1,
       description: description,
       creationDate: DateTime.now(),
     );
@@ -250,6 +264,23 @@ class Store {
         .doc('$routine');
 
     return routineDoc.delete();
+  }
+
+  static Future<int> maxRoutineSortOrder(bool active) async {
+    db = await DB.instance.database;
+
+    final maxSortOrder = ((await db.query(
+          TableNames.routines,
+          columns: ['COUNT(id) AS sortorder'],
+          where: 'uid = ? AND isactive = ?',
+          whereArgs: [
+            FirebaseAuth.instance.currentUser?.uid ?? 'null',
+            active ? 1 : 0,
+          ],
+        ))[0]['sortorder'] ??
+        1) as int;
+
+    return maxSortOrder;
   }
 
   static Future<void> _loadUserWorkouts(DocumentReference userDoc) async {

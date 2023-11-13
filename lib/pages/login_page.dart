@@ -86,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
                                       setState(() {
                                         _isLoading = false;
                                       });
-                                      Utils.showTextSnackbar(
+                                      Utils.showSnackbar(
                                         context,
                                         'Connection failed',
                                       );

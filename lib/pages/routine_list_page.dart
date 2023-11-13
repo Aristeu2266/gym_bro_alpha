@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:gym_bro_alpha/components/routine_tile.dart';
+import 'package:gym_bro_alpha/components/routine_list_widget.dart';
 import 'package:gym_bro_alpha/exceptions/connection_exception.dart';
 import 'package:gym_bro_alpha/models/routine_list_model.dart';
 import 'package:gym_bro_alpha/utils/utils.dart';
 import 'package:provider/provider.dart';
+
+import '../components/expand_button.dart';
 
 class RoutineListPage extends StatefulWidget {
   const RoutineListPage({super.key});
@@ -17,16 +19,17 @@ class _RoutineListPageState extends State<RoutineListPage> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _nameMaxLength = 50;
-  bool _isScrollEnd = false;
+  late bool _isScrollEnd;
 
-  void _onReorder(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
-    Provider.of<RoutineListModel>(
-      context,
-      listen: false,
-    ).move(oldIndex, newIndex);
+  late bool _showActive;
+  late bool _showInactive;
+
+  @override
+  void initState() {
+    super.initState();
+    _isScrollEnd = false;
+    _showActive = true;
+    _showInactive = false;
   }
 
   void addRoutine() {
@@ -140,7 +143,7 @@ class _RoutineListPageState extends State<RoutineListPage> {
               await routineList.refresh();
             } on ConnectionException catch (e) {
               if (mounted) {
-                Utils.showTextSnackbar(context, e.message);
+                Utils.showSnackbar(context, e.message);
               }
             }
           },
@@ -155,59 +158,50 @@ class _RoutineListPageState extends State<RoutineListPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ReorderableListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          onReorder: _onReorder,
-                          itemCount: routineList.routines.length,
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          header: const Text(
+                        // Active routines list
+                        ExpandButton(
+                          text: Text(
                             'Workout routines',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.w700,
+                              color: Theme.of(context).colorScheme.onBackground,
                             ),
                           ),
-                          itemBuilder: (ctx, index) {
-                            return Dismissible(
-                              key: ValueKey(routineList.routines[index].id),
-                              background: Container(
-                                margin: const EdgeInsets.symmetric(vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              onDismissed: (_) {
-                                routineList.delete(index);
-                              },
-                              child: ChangeNotifierProvider.value(
-                                key: ValueKey(routineList.routines[index]),
-                                value: routineList.routines[index],
-                                child: const RoutineTile(),
-                              ),
-                            );
+                          callback: () {
+                            setState(() {
+                              _showActive = !_showActive;
+                            });
                           },
+                          initialValue: true,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: TextButton(
-                                onPressed: () => addRoutine(),
-                                child: Text(
-                                  '+ Add Routine',
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onBackground,
-                                    fontSize: 18,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 100),
+                          height: _showActive
+                              ? routineList.activeRoutines.length * 65
+                              : 0,
+                          child: const RoutineListWidget(active: true),
+                        ),
+                        AddRoutineButton(addRoutine: addRoutine),
+                        if (routineList.inactiveRoutines.isNotEmpty)
+                          ExpandButton(
+                            text: const Text(
+                              'Inactive Routines',
+                              style: TextStyle(fontSize: 18),
                             ),
-                          ],
+                            callback: () {
+                              setState(() {
+                                _showInactive = !_showInactive;
+                              });
+                            },
+                            initialValue: false,
+                          ),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 100),
+                          height: _showInactive
+                              ? routineList.inactiveRoutines.length * 65
+                              : 0,
+                          child: const RoutineListWidget(active: false),
                         ),
                       ],
                     ),
@@ -225,6 +219,37 @@ class _RoutineListPageState extends State<RoutineListPage> {
               child: const Icon(Icons.add),
             )
           : null,
+    );
+  }
+}
+
+class AddRoutineButton extends StatelessWidget {
+  const AddRoutineButton({
+    required this.addRoutine,
+    super.key,
+  });
+
+  final void Function() addRoutine;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Expanded(
+          child: TextButton(
+            onPressed: () => addRoutine(),
+            child: Text(
+              '+ Add Routine',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onBackground,
+                fontSize: 18,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

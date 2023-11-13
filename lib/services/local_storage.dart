@@ -53,6 +53,7 @@ class DB {
       id INTEGER NOT NULL,
       uid TEXT NOT NULL,
       name TEXT NOT NULL,
+      isactive BOOLEAN NOT NULL,
       sortorder INTEGER NOT NULL,
       description TEXT NULL,
       creationdate DATETIME NOT NULL,
