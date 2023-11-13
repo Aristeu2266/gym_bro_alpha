@@ -9,6 +9,7 @@ class RoutineModel extends DBObject with ChangeNotifier {
   late String name;
   late int _sortOrder;
   String? description;
+  final DateTime creationDate;
   List<WorkoutModel> workouts = [];
 
   RoutineModel({
@@ -17,6 +18,7 @@ class RoutineModel extends DBObject with ChangeNotifier {
     required this.name,
     required sortOrder,
     this.description,
+    required this.creationDate,
   }) {
     _sortOrder = sortOrder;
   }
@@ -39,6 +41,7 @@ class RoutineModel extends DBObject with ChangeNotifier {
       'name': name,
       'sortorder': _sortOrder,
       'description': description,
+      'creationdate': creationDate.toIso8601String(),
     };
   }
 
@@ -49,6 +52,7 @@ class RoutineModel extends DBObject with ChangeNotifier {
       name: map['name'] as String,
       sortOrder: map['sortorder'] as int,
       description: map['description'] as String?,
+      creationDate: DateTime.parse(map['creationdate'] as String),
     );
   }
 

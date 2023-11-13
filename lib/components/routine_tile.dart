@@ -13,10 +13,14 @@ class _RoutineTileState extends State<RoutineTile> {
   @override
   Widget build(BuildContext context) {
     return Consumer<RoutineModel>(builder: (context, routine, child) {
-      return Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        child: ListTile(
-          title: Text(routine.name),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Card(
+          margin: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          child: ListTile(
+            title: Text(routine.name),
+          ),
         ),
       );
     });

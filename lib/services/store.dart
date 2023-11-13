@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gym_bro_alpha/exceptions/connection_exception.dart';
 import 'package:gym_bro_alpha/models/db_object.dart';
 import 'package:gym_bro_alpha/models/routine_model.dart';
 import 'package:gym_bro_alpha/models/workout_model.dart';
@@ -11,7 +12,7 @@ import 'package:sqflite/sqflite.dart';
 class Store {
   static late Database db;
 
-  static Future<List<Map<String, Object?>>> get userRoutines async {
+  static Future<List<Map<String, dynamic>>> get localUserRoutines async {
     db = await DB.instance.database;
 
     return await db.query(
@@ -60,22 +61,60 @@ class Store {
         .collection(CollectionNames.users)
         .doc(FirebaseAuth.instance.currentUser!.uid);
 
+    await _loadUserRoutines(userDoc);
     await _loadUserWorkouts(userDoc);
   }
 
-  static Future<void> _loadUserWorkouts(DocumentReference userDoc) async {
+  static Future<void> _loadUserRoutines(DocumentReference userDoc) async {
     db = await DB.instance.database;
 
-    final workoutsDocs =
-        (await userDoc.collection(CollectionNames.workouts).get()).docs
-          ..removeWhere((doc) => doc.id == 'sortOrder');
-    final workouts = workoutsDocs.map((doc) => doc.data()).toList();
-    workouts.sort((a, b) {
-      return a['sortOrder'] - b['sortOrder'];
-    });
+    final routines = (await userDoc.collection(CollectionNames.routines).get())
+        .docs
+        .map((doc) => doc.data())
+        .toList()
+      ..sort((a, b) => a['sortorder'] - b['sortorder']);
 
-    for (Map<String, dynamic> workout in workouts) {
-      await db.insert(TableNames.workouts, workout);
+    for (Map<String, dynamic> routine in routines) {
+      await db.insert(
+        TableNames.routines,
+        routine,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+  }
+
+  static Future<void> refreshUserRoutines() async {
+    if (await Connectivity().checkConnectivity() == ConnectivityResult.none) {
+      throw ConnectionException('Connection failed');
+    }
+
+    db = await DB.instance.database;
+
+    final userDoc = FirebaseFirestore.instance
+        .collection(CollectionNames.users)
+        .doc(FirebaseAuth.instance.currentUser!.uid);
+
+    final routines = (await userDoc.collection(CollectionNames.routines).get())
+        .docs
+        .map((doc) => doc.data())
+        .toList()
+      ..sort((a, b) => a['id'] - b['id']);
+
+    final localRoutinesIds =
+        (await localUserRoutines).map((e) => e['id'] as int).toList();
+
+    for (Map<String, dynamic> routine in routines) {
+      if (localRoutinesIds.contains(routine['id'])) {
+        final localRoutine = (await localUserRoutines)
+            .firstWhere((e) => routine['id'] == e['id']);
+        if (DateTime.parse(routine['creationdate'])
+            .isAfter(DateTime.parse(localRoutine['creationdate']))) {
+          _deleteCloudRoutine(routine['id']);
+          db.insert(TableNames.routines, routine);
+        }
+      } else {
+        db.insert(TableNames.routines, routine);
+      }
     }
   }
 
@@ -110,6 +149,7 @@ class Store {
       name: name,
       sortOrder: idNSort.isNotEmpty ? idNSort[0]['sortorder'] as int : 1,
       description: description,
+      creationDate: DateTime.now(),
     );
 
     db.insert(
@@ -136,13 +176,13 @@ class Store {
 
   static Future<void> _routineCloudSet(RoutineModel routine,
       [SetOptions? setOptions]) async {
-    final workoutCol = FirebaseFirestore.instance
+    final routineCol = FirebaseFirestore.instance
         .collection(CollectionNames.users)
         .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection(CollectionNames.routines);
-    final workoutDoc = workoutCol.doc('${routine.id}');
+        .collection(CollectionNames.routines)
+        .doc('${routine.id}');
 
-    return workoutDoc.set(
+    return routineCol.set(
       routine.toMap(),
       setOptions,
     );
@@ -177,6 +217,57 @@ class Store {
       routine,
       SetOptions(merge: true),
     );
+  }
+
+  static Future<void> deleteRoutine(RoutineModel routine) async {
+    db = await DB.instance.database;
+
+    db.delete(
+      TableNames.routines,
+      where: 'id = ? AND uid = ?',
+      whereArgs: [routine.id, routine.uid],
+    );
+
+    final connectivity = await Connectivity().checkConnectivity();
+    if (FirebaseAuth.instance.currentUser != null) {
+      if (connectivity != ConnectivityResult.none) {
+        _deleteCloudRoutine(routine.id);
+      } else {
+        _toBeUploaded(
+          tableName: TableNames.routines,
+          object: routine,
+          operation: 'delete',
+        );
+      }
+    }
+  }
+
+  static Future<void> _deleteCloudRoutine(int routine) async {
+    final routineDoc = FirebaseFirestore.instance
+        .collection(CollectionNames.users)
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection(CollectionNames.routines)
+        .doc('$routine');
+
+    return routineDoc.delete();
+  }
+
+  static Future<void> _loadUserWorkouts(DocumentReference userDoc) async {
+    db = await DB.instance.database;
+
+    final workouts = (await userDoc.collection(CollectionNames.workouts).get())
+        .docs
+        .map((doc) => doc.data())
+        .toList()
+      ..sort((a, b) => a['sortorder'] - b['sortorder']);
+
+    for (Map<String, dynamic> workout in workouts) {
+      await db.insert(
+        TableNames.workouts,
+        workout,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
   }
 
   static Future<WorkoutModel> newWorkout(String name, int routineId) async {
@@ -224,11 +315,11 @@ class Store {
 
   static Future<void> _workoutCloudSet(WorkoutModel workout,
       [SetOptions? setOptions]) async {
-    final workoutCol = FirebaseFirestore.instance
+    final workoutDoc = FirebaseFirestore.instance
         .collection(CollectionNames.users)
         .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection(CollectionNames.workouts);
-    final workoutDoc = workoutCol.doc('${workout.id}');
+        .collection(CollectionNames.workouts)
+        .doc('${workout.id}');
 
     return workoutDoc.set(
       workout.toMap(),

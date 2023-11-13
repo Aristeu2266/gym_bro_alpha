@@ -9,15 +9,26 @@ class RoutineListModel with ChangeNotifier {
   RoutineListModel();
 
   Future<void> load() async {
-    routines = (await Store.userRoutines)
+    routines = (await Store.localUserRoutines)
         .map(
           (map) => RoutineModel.mapToModel(map),
         )
         .toList();
   }
 
+  Future<void> refresh() async {
+    await Store.refreshUserRoutines();
+    await load();
+  }
+
   Future<void> add(String name, String? description) async {
     routines.add(await Store.newRoutine(name, description));
+
+    notifyListeners();
+  }
+
+  Future<void> delete(int index) async {
+    routines.removeAt(index);
 
     notifyListeners();
   }

@@ -55,6 +55,7 @@ class DB {
       name TEXT NOT NULL,
       sortorder INTEGER NOT NULL,
       description TEXT NULL,
+      creationdate DATETIME NOT NULL,
       PRIMARY KEY (id, uid)
     );
   ''';

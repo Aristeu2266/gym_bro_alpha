@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/components/routine_tile.dart';
+import 'package:gym_bro_alpha/exceptions/connection_exception.dart';
 import 'package:gym_bro_alpha/models/routine_list_model.dart';
+import 'package:gym_bro_alpha/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 class RoutineListPage extends StatefulWidget {
@@ -120,70 +122,99 @@ class _RoutineListPageState extends State<RoutineListPage> {
     final routineList = Provider.of<RoutineListModel>(context);
 
     return Scaffold(
-      body: RefreshIndicator(
-        // TODO: fazer um método para sincronizar os dados com a núvem
-        onRefresh: () async {},
-        child: NotificationListener<ScrollNotification>(
-          onNotification: (scrollNotification) {
-            setState(() {
-              if (scrollNotification.metrics.atEdge &&
-                  scrollNotification.metrics.pixels != 0) {
-                _isScrollEnd = true;
-              } else {
-                _isScrollEnd = false;
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (scrollNotification) {
+          setState(() {
+            if (scrollNotification.metrics.atEdge &&
+                scrollNotification.metrics.pixels != 0) {
+              _isScrollEnd = true;
+            } else {
+              _isScrollEnd = false;
+            }
+          });
+          return true;
+        },
+        child: RefreshIndicator(
+          onRefresh: () async {
+            try {
+              await routineList.refresh();
+            } on ConnectionException catch (e) {
+              if (mounted) {
+                Utils.showTextSnackbar(context, e.message);
               }
-            });
-            return true;
+            }
           },
-          child: SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ReorderableListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    onReorder: _onReorder,
-                    itemCount: routineList.routines.length,
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    header: const Text(
-                      'Workout routines',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    itemBuilder: (ctx, index) {
-                      return ChangeNotifierProvider.value(
-                        key: ValueKey(routineList.routines[index]),
-                        value: routineList.routines[index],
-                        child: const RoutineTile(),
-                      );
-                    },
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () => addRoutine(),
-                          child: Text(
-                            '+ Add Routine',
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ReorderableListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          onReorder: _onReorder,
+                          itemCount: routineList.routines.length,
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          header: const Text(
+                            'Workout routines',
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onBackground,
-                              fontSize: 18,
-                              decoration: TextDecoration.underline,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
+                          itemBuilder: (ctx, index) {
+                            return Dismissible(
+                              key: ValueKey(routineList.routines[index].id),
+                              background: Container(
+                                margin: const EdgeInsets.symmetric(vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              onDismissed: (_) {
+                                routineList.delete(index);
+                              },
+                              child: ChangeNotifierProvider.value(
+                                key: ValueKey(routineList.routines[index]),
+                                value: routineList.routines[index],
+                                child: const RoutineTile(),
+                              ),
+                            );
+                          },
                         ),
-                      ),
-                    ],
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () => addRoutine(),
+                                child: Text(
+                                  '+ Add Routine',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onBackground,
+                                    fontSize: 18,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
