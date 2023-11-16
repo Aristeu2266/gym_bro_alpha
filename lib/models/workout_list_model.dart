@@ -23,13 +23,13 @@ class WorkoutListModel with ChangeNotifier {
   //   return workout;
   // }
 
-  void move(int oldIndex, int newIndex) {
-    workouts.insert(newIndex, workouts.removeAt(oldIndex));
+  // void move(int oldIndex, int newIndex) {
+  //   workouts.insert(newIndex, workouts.removeAt(oldIndex));
 
-    for (WorkoutModel workout in workouts) {
-      if (workout.sortOrder != workouts.indexOf(workout)) {
-        workout.sortOrder = workouts.indexOf(workout);
-      }
-    }
-  }
+  //   for (WorkoutModel workout in workouts) {
+  //     if (workout.sortOrder != workouts.indexOf(workout)) {
+  //       workout.sortOrder = workouts.indexOf(workout);
+  //     }
+  //   }
+  // }
 }

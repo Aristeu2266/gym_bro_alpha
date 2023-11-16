@@ -6,6 +6,7 @@ import 'package:gym_bro_alpha/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 import '../components/expand_button.dart';
+import 'add_button.dart';
 
 class RoutineListPage extends StatefulWidget {
   const RoutineListPage({super.key});
@@ -127,14 +128,23 @@ class _RoutineListPageState extends State<RoutineListPage> {
     return Scaffold(
       body: NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) {
-          setState(() {
-            if (scrollNotification.metrics.atEdge &&
-                scrollNotification.metrics.pixels != 0) {
-              _isScrollEnd = true;
-            } else {
-              _isScrollEnd = false;
-            }
-          });
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) {
+              bool A = scrollNotification.metrics.atEdge;
+              bool B = scrollNotification.metrics.pixels == 0;
+              bool C = _showInactive;
+              bool D = _showActive;
+              bool E = scrollNotification.metrics.maxScrollExtent == 0.0;
+              // some piece of boolean monstrosity only cause I had fun doing it lol
+              setState(() {
+                if (E || (A && !B && !C && D) || (A && B && C & !D)) {
+                  _isScrollEnd = true;
+                } else {
+                  _isScrollEnd = false;
+                }
+              });
+            },
+          );
           return true;
         },
         child: RefreshIndicator(
@@ -175,14 +185,13 @@ class _RoutineListPageState extends State<RoutineListPage> {
                           },
                           initialValue: true,
                         ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 100),
-                          height: _showActive
-                              ? routineList.activeRoutines.length * 65
-                              : 0,
-                          child: const RoutineListWidget(active: true),
+                        if (_showActive) const RoutineListWidget(active: true),
+                        AddButton(
+                          text: '+ Add Routine',
+                          addCallback: addRoutine,
                         ),
-                        AddRoutineButton(addRoutine: addRoutine),
+
+                        // Inactive routine list
                         if (routineList.inactiveRoutines.isNotEmpty)
                           ExpandButton(
                             text: const Text(
@@ -196,13 +205,8 @@ class _RoutineListPageState extends State<RoutineListPage> {
                             },
                             initialValue: false,
                           ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 100),
-                          height: _showInactive
-                              ? routineList.inactiveRoutines.length * 65
-                              : 0,
-                          child: const RoutineListWidget(active: false),
-                        ),
+                        if (_showInactive)
+                          const RoutineListWidget(active: false),
                       ],
                     ),
                   ),
@@ -219,37 +223,6 @@ class _RoutineListPageState extends State<RoutineListPage> {
               child: const Icon(Icons.add),
             )
           : null,
-    );
-  }
-}
-
-class AddRoutineButton extends StatelessWidget {
-  const AddRoutineButton({
-    required this.addRoutine,
-    super.key,
-  });
-
-  final void Function() addRoutine;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(
-          child: TextButton(
-            onPressed: () => addRoutine(),
-            child: Text(
-              '+ Add Routine',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onBackground,
-                fontSize: 18,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gym_bro_alpha/models/routine_list_model.dart';
+import 'package:gym_bro_alpha/pages/routine_page.dart';
 import 'package:gym_bro_alpha/services/local_storage.dart';
 import 'package:gym_bro_alpha/pages/auth_page.dart';
 import 'package:gym_bro_alpha/pages/home_page.dart';
@@ -127,15 +128,16 @@ class _MyAppState extends State<MyApp> {
               )
             : null,
         routes: {
-          PageRoutes.root: (ctx) => AuthPage(refreshTheme: loadTheme),
-          PageRoutes.login: (ctx) => const LoginPage(),
-          PageRoutes.signup: (ctx) => const SignupPage(),
-          PageRoutes.resetPassword: (ctx) => const ResetPasswordPage(),
-          PageRoutes.home: (ctx) => HomePage(refreshTheme: loadTheme),
-          PageRoutes.settings: (ctx) => SettingsPage(
+          PageRoutes.root: (_) => AuthPage(refreshTheme: loadTheme),
+          PageRoutes.login: (_) => const LoginPage(),
+          PageRoutes.signup: (_) => const SignupPage(),
+          PageRoutes.resetPassword: (_) => const ResetPasswordPage(),
+          PageRoutes.home: (_) => HomePage(refreshTheme: loadTheme),
+          PageRoutes.settings: (_) => SettingsPage(
               themeSelected: themeSelected,
               handleThemeSelect: handleThemeSelect),
-          PageRoutes.workout: (ctx) => const WorkoutPage(),
+          PageRoutes.routine: (_) => const RoutinePage(),
+          PageRoutes.workout: (_) => const WorkoutPage(),
         },
       ),
     );

@@ -6,24 +6,47 @@ import 'package:gym_bro_alpha/services/store.dart';
 class RoutineModel extends DBObject with ChangeNotifier {
   final int id;
   final String uid;
-  late String name;
+  late String _name;
   late bool _isActive;
   late int _sortOrder;
-  String? description;
+  String? _description;
   final DateTime creationDate;
   List<WorkoutModel> workouts = [];
 
   RoutineModel({
     required this.id,
     required this.uid,
-    required this.name,
+    required name,
     required bool isActive,
     required int sortOrder,
-    this.description,
+    String? description,
     required this.creationDate,
   }) {
+    _name = name;
     _isActive = isActive;
     _sortOrder = sortOrder;
+    _description = description;
+  }
+
+  Future<void> update({String? name, String? description}) async {
+    _name = name ?? _name;
+    _description = description;
+    Store.updateRoutine(this);
+    notifyListeners();
+  }
+
+  String get name {
+    return _name;
+  }
+
+  set name(String newName) {
+    _name = newName;
+    Store.updateRoutine(this);
+    notifyListeners();
+  }
+
+  String? get description {
+    return _description;
   }
 
   bool get isActive {
@@ -53,10 +76,10 @@ class RoutineModel extends DBObject with ChangeNotifier {
     return {
       'id': id,
       'uid': uid,
-      'name': name,
+      'name': _name,
       'isactive': _isActive ? 1 : 0,
       'sortorder': _sortOrder,
-      'description': description,
+      'description': _description,
       'creationdate': creationDate.toIso8601String(),
     };
   }

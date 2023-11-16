@@ -14,9 +14,10 @@ class PageRoutes {
   static const root = '/';
   static const login = '/login';
   static const signup = '/signup';
-  static const resetPassword = '/resetPassword';
+  static const resetPassword = '/reset-password';
   static const home = '/home';
   static const settings = '/settings';
+  static const routine = '/routine';
   static const workout = '/workout';
 }
 
