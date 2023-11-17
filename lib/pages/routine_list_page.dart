@@ -16,21 +16,27 @@ class RoutineListPage extends StatefulWidget {
 }
 
 class _RoutineListPageState extends State<RoutineListPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  late GlobalKey<FormState> _formKey;
+  late TextEditingController _nameController;
+  late TextEditingController _descriptionController;
   final _nameMaxLength = 50;
-  late bool _isScrollEnd;
-
-  late bool _showActive;
-  late bool _showInactive;
+  bool _isScrollEnd = false;
+  bool _showActive = true;
+  bool _showInactive = false;
 
   @override
   void initState() {
     super.initState();
-    _isScrollEnd = false;
-    _showActive = true;
-    _showInactive = false;
+    _formKey = GlobalKey<FormState>();
+    _nameController = TextEditingController();
+    _descriptionController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   void addRoutine() {

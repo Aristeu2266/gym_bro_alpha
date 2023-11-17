@@ -15,11 +15,31 @@ class Store {
   static Future<List<Map<String, dynamic>>> get localUserRoutines async {
     db = await DB.instance.database;
 
-    return await db.query(
+    final routines = await db.query(
       TableNames.routines,
       where: 'uid = ?',
       whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
     );
+
+    final workouts = await db.query(
+      TableNames.workouts,
+      where: 'uid = ?',
+      whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
+    );
+
+    final List<Map<String, dynamic>> clone = [];
+
+    for (Map<String, dynamic> routine in routines) {
+      clone.add({
+        ...routine,
+        'workouts': workouts
+            .where((e) => e['routineid'] == routine['id'])
+            .map((e) => WorkoutModel.mapToModel(e))
+            .toList(),
+      });
+    }
+
+    return clone;
   }
 
   static Future<String> get latestUId async {
@@ -98,15 +118,16 @@ class Store {
         .docs
         .map((doc) => doc.data())
         .toList()
-      ..sort((a, b) => a['id'] - b['id']);
+      ..sort((a, b) => a['sortorder'] - b['sortorder']);
 
     final localRoutinesIds =
         (await localUserRoutines).map((e) => e['id'] as int).toList();
+    final localRoutinesList = await localUserRoutines;
 
     for (Map<String, dynamic> routine in routines) {
       if (localRoutinesIds.contains(routine['id'])) {
-        final localRoutine = (await localUserRoutines)
-            .firstWhere((e) => routine['id'] == e['id']);
+        final localRoutine =
+            localRoutinesList.firstWhere((e) => routine['id'] == e['id']);
         if (DateTime.parse(routine['creationdate'])
             .isAtSameMomentAs(DateTime.parse(localRoutine['creationdate']))) {
           // _deleteCloudRoutine(routine['id']);
@@ -118,6 +139,7 @@ class Store {
           );
         } else if (DateTime.parse(routine['creationdate'])
             .isAfter(DateTime.parse(localRoutine['creationdate']))) {
+          //TODO: também precisaria apagar tudo relacionado a essa rotina apagada
           await db.delete(
             TableNames.routines,
             where: 'id = ? AND uid = ?',
@@ -286,11 +308,12 @@ class Store {
   static Future<void> _loadUserWorkouts(DocumentReference userDoc) async {
     db = await DB.instance.database;
 
+    // TODO: aprender a pegar a coleção de workout de dentro de cada rotina
+    // ou mudar a forma que é armazenada na nuvem
     final workouts = (await userDoc.collection(CollectionNames.workouts).get())
         .docs
         .map((doc) => doc.data())
-        .toList()
-      ..sort((a, b) => a['sortorder'] - b['sortorder']);
+        .toList();
 
     for (Map<String, dynamic> workout in workouts) {
       await db.insert(
@@ -307,8 +330,8 @@ class Store {
     List<Map<String, Object?>> idNSort = await db.query(
       TableNames.workouts,
       columns: ['MAX(id)+1 AS id', 'COUNT(id)+1 as sortorder'],
-      where: 'uid = ?',
-      whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
+      where: 'uid = ? AND routineid = ?',
+      whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null', routineId],
       groupBy: 'uid',
     );
 

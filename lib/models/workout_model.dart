@@ -64,7 +64,7 @@ class WorkoutModel extends DBObject with ChangeNotifier {
     return WorkoutModel(
       id: map['id'] as int,
       uId: map['uid'] as String,
-      routineId: map['routineId'] as int,
+      routineId: map['routineid'] as int,
       isActive: (map['isactive'] as int) == 1 ? true : false,
       sortOrder: map['sortorder'] as int,
       name: map['name'] as String,

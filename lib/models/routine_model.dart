@@ -21,6 +21,7 @@ class RoutineModel extends DBObject with ChangeNotifier {
     required int sortOrder,
     String? description,
     required this.creationDate,
+    this.workouts = const [],
   }) {
     _name = name;
     _isActive = isActive;
@@ -72,6 +73,11 @@ class RoutineModel extends DBObject with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> addWorkout(String workoutName) async {
+    workouts.add(await Store.newWorkout(workoutName, id));
+    notifyListeners();
+  }
+
   Map<String, Object?> toMap() {
     return {
       'id': id,
@@ -93,6 +99,7 @@ class RoutineModel extends DBObject with ChangeNotifier {
       sortOrder: map['sortorder'] as int,
       description: map['description'] as String?,
       creationDate: DateTime.parse(map['creationdate'] as String),
+      workouts: (map['workouts'] ?? []) as List<WorkoutModel>,
     );
   }
 

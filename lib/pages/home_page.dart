@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     widget.refreshTheme(true);
-    await routineListModel.load();
+    await routineListModel.refresh();
   }
 
   @override
