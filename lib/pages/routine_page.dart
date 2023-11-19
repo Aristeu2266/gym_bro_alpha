@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/components/expand_button.dart';
+import 'package:gym_bro_alpha/exceptions/connection_exception.dart';
 import 'package:gym_bro_alpha/models/routine_model.dart';
 import 'package:gym_bro_alpha/models/workout_model.dart';
 import 'package:gym_bro_alpha/pages/add_button.dart';
+import 'package:gym_bro_alpha/utils/utils.dart';
 
 class RoutinePage extends StatefulWidget {
   const RoutinePage({super.key});
@@ -14,6 +16,7 @@ class RoutinePage extends StatefulWidget {
 class _RoutinePageState extends State<RoutinePage> {
   late RoutineModel routine;
   late GlobalKey<FormState> _formKey;
+  late GlobalKey<ExpandButtonState> _globalKey;
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   late TextEditingController _workoutNameController;
@@ -22,13 +25,14 @@ class _RoutinePageState extends State<RoutinePage> {
   final int _titleMaxLength = 30;
   bool _isEditing = false;
   bool _isDirty = false;
-  bool _isScrollEnd = false;
   bool _showDescription = false;
+  bool _isScrollEnd = false;
 
   @override
   void initState() {
     super.initState();
     _formKey = GlobalKey<FormState>();
+    _globalKey = GlobalKey<ExpandButtonState>();
     _titleController = TextEditingController();
     _descriptionController = TextEditingController();
     _workoutNameController = TextEditingController();
@@ -52,80 +56,6 @@ class _RoutinePageState extends State<RoutinePage> {
     routine = ModalRoute.of(context)?.settings.arguments as RoutineModel;
     _titleController.text = routine.name;
     _descriptionController.text = routine.description ?? '';
-  }
-
-  PreferredSizeWidget _appBar() {
-    return AppBar(
-      centerTitle: true,
-      title: _isEditing
-          ? TextField(
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              maxLength: _titleMaxLength,
-              style: const TextStyle(
-                fontSize: 21,
-                fontFamily: 'Roboto-Regular',
-              ),
-              decoration: const InputDecoration(
-                counterText: '',
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.only(bottom: 4, right: 3),
-              ),
-              controller: _titleController,
-              focusNode: _titleFocus,
-            )
-          : FittedBox(
-              fit: BoxFit.cover,
-              child: Text(
-                routine.name,
-                style: const TextStyle(
-                  fontSize: 21,
-                  fontFamily: 'Roboto-Regular',
-                ),
-              ),
-            ),
-      actions: [
-        IconButton(
-          onPressed: () {
-            setState(() {
-              if (!_isDirty) {
-                _isEditing = !_isEditing;
-                _showDescription = true;
-              }
-
-              if (!_isEditing && !_isDirty) {
-                // Saving
-                if (_titleController.text.isNotEmpty) {
-                  if (_titleController.text != routine.name) {
-                    routine.name = _titleController.text;
-                  }
-                } else {
-                  _titleController.text = routine.name;
-                }
-                FocusManager.instance.primaryFocus?.unfocus();
-              }
-              if (_isDirty) {
-                setState(() {
-                  _isDirty = !_isDirty;
-                  _isEditing = false;
-                });
-                routine.update(
-                  name: _titleController.text,
-                  description: _descriptionController.text,
-                );
-                FocusManager.instance.primaryFocus?.unfocus();
-              } else {
-                // Entering edit mode
-                _titleFocus.requestFocus();
-              }
-            });
-          },
-          icon: _isEditing || _isDirty
-              ? const Icon(Icons.save_outlined)
-              : const Icon(Icons.edit_outlined),
-        ),
-      ],
-    );
   }
 
   void addWorkout() {
@@ -203,15 +133,26 @@ class _RoutinePageState extends State<RoutinePage> {
     });
   }
 
+  void _onReorder(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    routine.reorderWorkout(oldIndex, newIndex);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
-        setState(() {
-          _isEditing = false;
-        });
-        _titleController.text = routine.name;
+        if (!_isDirty) {
+          setState(() {
+            _isEditing = false;
+            if (_titleController.text.isEmpty) {
+              _titleController.text = routine.name;
+            }
+          });
+        }
       },
       child: Scaffold(
         appBar: _appBar(),
@@ -236,14 +177,14 @@ class _RoutinePageState extends State<RoutinePage> {
           },
           child: RefreshIndicator(
             onRefresh: () async {
-              // TODO: refresh da rotina
-              // try {
-              //   await routineList.refresh();
-              // } on ConnectionException catch (e) {
-              //   if (mounted) {
-              //     Utils.showSnackbar(context, e.message);
-              //   }
-              // }
+              try {
+                await routine.refresh();
+                setState(() {});
+              } on ConnectionException catch (e) {
+                if (mounted) {
+                  Utils.showSnackbar(context, e.message);
+                }
+              }
             },
             child: Column(
               mainAxisSize: MainAxisSize.max,
@@ -258,7 +199,7 @@ class _RoutinePageState extends State<RoutinePage> {
                         children: [
                           if ((routine.description?.isNotEmpty ?? false) ||
                               _isEditing)
-                            descriptionCard(),
+                            _descriptionCard(),
                           const SizedBox(height: 12),
                           Text(
                             'Workouts',
@@ -270,8 +211,7 @@ class _RoutinePageState extends State<RoutinePage> {
                           ),
                           ReorderableListView.builder(
                             physics: const NeverScrollableScrollPhysics(),
-                            onReorder: (oldIndex,
-                                newIndex) {}, // TODO: => _onReorder(routineListModel, oldIndex, newIndex),
+                            onReorder: _onReorder,
                             itemCount: routine.workouts.length,
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
@@ -306,71 +246,175 @@ class _RoutinePageState extends State<RoutinePage> {
     );
   }
 
-  GestureDetector descriptionCard() {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _isEditing = true;
-          _descriptionFocus.requestFocus();
-        });
-      },
-      child: Row(
-        children: [
-          Expanded(
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-              margin: EdgeInsets.zero,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ExpandButton(
-                      text: Text(
-                        'Description',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 22,
-                          color: Theme.of(context).colorScheme.onBackground,
-                        ),
-                      ),
-                      initialValue:
-                          _descriptionController.text.isEmpty && _isEditing,
-                      callback: () {
-                        setState(() {
-                          _showDescription = !_showDescription;
-                        });
-                      },
-                    ),
-                    if (_showDescription)
-                      TextField(
-                        controller: _descriptionController,
-                        focusNode: _descriptionFocus,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          counterText: !_isEditing ? '' : null,
-                          hintText: 'Description...',
-                        ),
-                        minLines: null,
-                        maxLines: null,
-                        onTap: () {
-                          setState(() {
-                            _isEditing = true;
-                          });
-                        },
-                        onChanged: (_) {
-                          _isDirty = true;
-                        },
-                        maxLength: 256,
-                      ),
-                  ],
+  PreferredSizeWidget _appBar() {
+    return AppBar(
+      centerTitle: true,
+      title: _isEditing
+          ? TextField(
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              maxLength: _titleMaxLength,
+              style: const TextStyle(
+                fontSize: 21,
+                fontFamily: 'Roboto-Regular',
+              ),
+              decoration: const InputDecoration(
+                counterText: '',
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.only(bottom: 4, right: 3),
+              ),
+              controller: _titleController,
+              focusNode: _titleFocus,
+              onChanged: (_) => _isDirty = true,
+            )
+          : FittedBox(
+              fit: BoxFit.cover,
+              child: Text(
+                routine.name,
+                style: const TextStyle(
+                  fontSize: 21,
+                  fontFamily: 'Roboto-Regular',
                 ),
               ),
             ),
-          ),
-        ],
+      automaticallyImplyLeading: false,
+      leading: IconButton(
+        onPressed: () {
+          if (!_isDirty) {
+            Navigator.pop(context);
+          } else {
+            showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Discard Changes'),
+                content: const Text(
+                    'You have made changes that haven\'t been saved yet. Are you sure to discard changes?'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: const Text('No'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      backgroundColor:
+                          Theme.of(context).colorScheme.errorContainer,
+                      foregroundColor:
+                          Theme.of(context).colorScheme.onErrorContainer,
+                    ),
+                    child: const Text('Yes'),
+                  ),
+                ],
+              ),
+            ).then((answer) {
+              if (answer ?? false) {
+                Navigator.pop(context);
+              }
+            });
+          }
+        },
+        icon: const Icon(Icons.arrow_back),
       ),
+      actions: [
+        IconButton(
+          onPressed: () {
+            setState(() {
+              if (!_isDirty) {
+                _isEditing = !_isEditing;
+              }
+
+              if (_isEditing && !_isDirty) {
+                _titleFocus.requestFocus();
+                if (!_showDescription) {
+                  _globalKey.currentState?.toggleExpand();
+                }
+              } else {
+                if (_titleController.text.isEmpty) {
+                  _titleController.text = routine.name;
+                }
+                routine.update(
+                    name: _titleController.text,
+                    description: _descriptionController.text);
+                FocusManager.instance.primaryFocus?.unfocus();
+                // setState(() {
+                _isDirty = false;
+                _isEditing = false;
+                // });
+              }
+            });
+          },
+          icon: _isEditing || _isDirty
+              ? const Icon(Icons.save_outlined)
+              : const Icon(Icons.edit_outlined),
+        ),
+      ],
+    );
+  }
+
+  Row _descriptionCard() {
+    return Row(
+      children: [
+        Expanded(
+          child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ExpandButton(
+                    key: _globalKey,
+                    text: Text(
+                      'Description',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 22,
+                        color: Theme.of(context).colorScheme.onBackground,
+                      ),
+                    ),
+                    initialValue:
+                        false, //_descriptionController.text.isEmpty && _isEditing,
+                    callback: () {
+                      setState(() {
+                        _showDescription = !_showDescription;
+                      });
+                    },
+                  ),
+                  if (_showDescription)
+                    TextField(
+                      controller: _descriptionController,
+                      focusNode: _descriptionFocus,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        counterText: !_isEditing ? '' : null,
+                        hintText: 'Description...',
+                      ),
+                      minLines: null,
+                      maxLines: null,
+                      onTap: () {
+                        setState(() {
+                          _isEditing = true;
+                        });
+                      },
+                      onChanged: (_) {
+                        _isDirty = true;
+                      },
+                      maxLength: 256,
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

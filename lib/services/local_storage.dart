@@ -66,11 +66,10 @@ class DB {
       id INTEGER NOT NULL,
       uid TEXT NOT NULL,
       routineid INTEGER NOT NULL,
-      isactive BOOLEAN NOT NULL,
       sortorder INTEGER NOT NULL,
       name TEXT NOT NULL,
-      creation DATETIME NOT NULL,
-      PRIMARY KEY (id, uId, routineid)
+      creationdate DATETIME NOT NULL,
+      PRIMARY KEY (id, uId)
     );
   ''';
 

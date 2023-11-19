@@ -111,8 +111,9 @@ class RoutineListWidget extends StatelessWidget {
                   'Your routine has been inactivated.',
                   SnackBarAction(
                     label: 'UNDO',
-                    onPressed: () =>
-                        routineListModel.toggleIsActive(routineList[index]),
+                    onPressed: () => routineListModel
+                        .toggleIsActive(routineList[index])
+                        .catchError((_) {}),
                     textColor: Theme.of(context).colorScheme.primaryContainer,
                   ),
                 );

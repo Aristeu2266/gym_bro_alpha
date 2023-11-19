@@ -6,10 +6,9 @@ class WorkoutModel extends DBObject with ChangeNotifier {
   final int id;
   final String uId;
   final int routineId;
-  bool isActive;
   late int _sortOrder;
   late String _name;
-  final DateTime creation;
+  final DateTime creationDate;
   List exercises = [];
   List trainings = [];
 
@@ -17,10 +16,9 @@ class WorkoutModel extends DBObject with ChangeNotifier {
     required this.id,
     required this.uId,
     required this.routineId,
-    required this.isActive,
     required sortOrder,
     required name,
-    required this.creation,
+    required this.creationDate,
   }) {
     _name = name;
     _sortOrder = sortOrder;
@@ -51,12 +49,11 @@ class WorkoutModel extends DBObject with ChangeNotifier {
   Map<String, Object> toMap() {
     return {
       'id': id,
-      'uId': uId,
-      'routineId': routineId,
-      'isActive': isActive ? 1 : 0,
-      'sortOrder': _sortOrder,
+      'uid': uId,
+      'routineid': routineId,
+      'sortorder': _sortOrder,
       'name': _name,
-      'creation': creation.toIso8601String(),
+      'creationdate': creationDate.toIso8601String(),
     };
   }
 
@@ -65,10 +62,9 @@ class WorkoutModel extends DBObject with ChangeNotifier {
       id: map['id'] as int,
       uId: map['uid'] as String,
       routineId: map['routineid'] as int,
-      isActive: (map['isactive'] as int) == 1 ? true : false,
       sortOrder: map['sortorder'] as int,
       name: map['name'] as String,
-      creation: DateTime.parse(map['creation'] as String),
+      creationDate: DateTime.parse(map['creationdate'] as String),
     );
   }
 

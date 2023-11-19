@@ -15,17 +15,25 @@ class Store {
   static Future<List<Map<String, dynamic>>> get localUserRoutines async {
     db = await DB.instance.database;
 
-    final routines = await db.query(
+    final routines = (await db.query(
       TableNames.routines,
       where: 'uid = ?',
       whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
-    );
+    ))
+        .toList()
+      ..sort(
+        (a, b) => (a['sortorder'] as int) - (b['sortorder'] as int),
+      );
 
-    final workouts = await db.query(
+    final workouts = (await db.query(
       TableNames.workouts,
       where: 'uid = ?',
       whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
-    );
+    ))
+        .toList()
+      ..sort(
+        (a, b) => (a['sortorder'] as int) - (b['sortorder'] as int),
+      );
 
     final List<Map<String, dynamic>> clone = [];
 
@@ -40,6 +48,23 @@ class Store {
     }
 
     return clone;
+  }
+
+  static Future<List<Map<String, dynamic>>> localUserWorkouts(
+      int routineId) async {
+    db = await DB.instance.database;
+
+    final workouts = (await db.query(
+      TableNames.workouts,
+      where: 'uid = ? AND routineid = ?',
+      whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null', routineId],
+    ))
+        .toList()
+      ..sort(
+        (a, b) => (a['sortorder'] as int) - (b['sortorder'] as int),
+      );
+
+    return workouts;
   }
 
   static Future<String> get latestUId async {
@@ -103,6 +128,23 @@ class Store {
     }
   }
 
+  static Future<void> _loadUserWorkouts(DocumentReference userDoc) async {
+    db = await DB.instance.database;
+
+    final workouts = (await userDoc.collection(CollectionNames.workouts).get())
+        .docs
+        .map((doc) => doc.data())
+        .toList();
+
+    for (Map<String, dynamic> workout in workouts) {
+      await db.insert(
+        TableNames.workouts,
+        workout,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+  }
+
   static Future<void> refreshUserRoutines() async {
     if (await Connectivity().checkConnectivity() == ConnectivityResult.none) {
       throw ConnectionException('Connection failed');
@@ -117,12 +159,11 @@ class Store {
     final routines = (await userDoc.collection(CollectionNames.routines).get())
         .docs
         .map((doc) => doc.data())
-        .toList()
-      ..sort((a, b) => a['sortorder'] - b['sortorder']);
+        .toList();
 
-    final localRoutinesIds =
-        (await localUserRoutines).map((e) => e['id'] as int).toList();
     final localRoutinesList = await localUserRoutines;
+    final localRoutinesIds =
+        localRoutinesList.map((e) => e['id'] as int).toList();
 
     for (Map<String, dynamic> routine in routines) {
       if (localRoutinesIds.contains(routine['id'])) {
@@ -130,7 +171,6 @@ class Store {
             localRoutinesList.firstWhere((e) => routine['id'] == e['id']);
         if (DateTime.parse(routine['creationdate'])
             .isAtSameMomentAs(DateTime.parse(localRoutine['creationdate']))) {
-          // _deleteCloudRoutine(routine['id']);
           await db.update(
             TableNames.routines,
             routine,
@@ -139,16 +179,72 @@ class Store {
           );
         } else if (DateTime.parse(routine['creationdate'])
             .isAfter(DateTime.parse(localRoutine['creationdate']))) {
-          //TODO: também precisaria apagar tudo relacionado a essa rotina apagada
           await db.delete(
             TableNames.routines,
             where: 'id = ? AND uid = ?',
             whereArgs: [routine['id'], routine['uid']],
           );
+          await db.delete(
+            TableNames.workouts,
+            where: 'uid = ? AND routineid = ?',
+            whereArgs: [routine['uid'], routine['routineid']],
+          );
           await db.insert(TableNames.routines, routine);
+          await refreshUserWorkouts(routine['id']);
         }
       } else {
         db.insert(TableNames.routines, routine);
+      }
+    }
+  }
+
+  static Future<void> refreshUserWorkouts(int routineId) async {
+    if (await Connectivity().checkConnectivity() == ConnectivityResult.none) {
+      throw ConnectionException('Connection failed');
+    }
+
+    db = await DB.instance.database;
+
+    final userDoc = FirebaseFirestore.instance
+        .collection(CollectionNames.users)
+        .doc(FirebaseAuth.instance.currentUser!.uid);
+
+    final workouts = (await userDoc
+            .collection(CollectionNames.workouts)
+            .where('routineid', isEqualTo: routineId)
+            .get())
+        .docs
+        .map((doc) => doc.data())
+        .toList();
+
+    final localWorkoutsList = await localUserWorkouts(routineId);
+    final localWorkoutsIds =
+        localWorkoutsList.map((e) => e['id'] as int).toList();
+
+    for (Map<String, dynamic> workout in workouts) {
+      if (localWorkoutsIds.contains(workout['id'])) {
+        final localWorkout =
+            localWorkoutsList.firstWhere((e) => workout['id'] == e['id']);
+        if (DateTime.parse(workout['creationdate'])
+            .isAtSameMomentAs(DateTime.parse(localWorkout['creationdate']))) {
+          db.update(
+            TableNames.workouts,
+            workout,
+            where: 'id = ? AND uid = ? AND routineid = ?',
+            whereArgs: [workout['id'], workout['uid'], workout['routineid']],
+          );
+        } else if (DateTime.parse(workout['creationdate'])
+            .isAfter(DateTime.parse(localWorkout['creationdate']))) {
+          // TODO: apagar também todos os dados relacionados a esse treino apagado
+          await db.delete(
+            TableNames.workouts,
+            where: 'id = ? AND uid = ? AND routineid = ?',
+            whereArgs: [workout['id'], workout['uid'], workout['routineid']],
+          );
+          await db.insert(TableNames.workouts, workout);
+        }
+      } else {
+        db.insert(TableNames.workouts, workout);
       }
     }
   }
@@ -305,44 +401,24 @@ class Store {
     return maxSortOrder;
   }
 
-  static Future<void> _loadUserWorkouts(DocumentReference userDoc) async {
-    db = await DB.instance.database;
-
-    // TODO: aprender a pegar a coleção de workout de dentro de cada rotina
-    // ou mudar a forma que é armazenada na nuvem
-    final workouts = (await userDoc.collection(CollectionNames.workouts).get())
-        .docs
-        .map((doc) => doc.data())
-        .toList();
-
-    for (Map<String, dynamic> workout in workouts) {
-      await db.insert(
-        TableNames.workouts,
-        workout,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
-  }
-
   static Future<WorkoutModel> newWorkout(String name, int routineId) async {
     db = await DB.instance.database;
 
-    List<Map<String, Object?>> idNSort = await db.query(
+    List<Map<String, Object?>> id = await db.query(
       TableNames.workouts,
-      columns: ['MAX(id)+1 AS id', 'COUNT(id)+1 as sortorder'],
-      where: 'uid = ? AND routineid = ?',
-      whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null', routineId],
+      columns: ['MAX(id)+1 AS id'],
+      where: 'uid = ?',
+      whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null'],
       groupBy: 'uid',
     );
 
     WorkoutModel workout = WorkoutModel(
-      id: idNSort.isNotEmpty ? idNSort[0]['id'] as int : 1,
+      id: id.isNotEmpty ? id[0]['id'] as int : 1,
       uId: FirebaseAuth.instance.currentUser?.uid ?? 'null',
       routineId: routineId,
-      isActive: true,
-      sortOrder: idNSort.isNotEmpty ? idNSort[0]['sortorder'] as int : 1,
+      sortOrder: (await maxWorkoutSortOrder(routineId)) + 1,
       name: name,
-      creation: DateTime.now(),
+      creationDate: DateTime.now(),
     );
 
     db.insert(
@@ -365,6 +441,23 @@ class Store {
     }
 
     return workout;
+  }
+
+  static Future<int> maxWorkoutSortOrder(int routineId) async {
+    db = await DB.instance.database;
+
+    final maxSortOrder = ((await db.query(
+          TableNames.workouts,
+          columns: ['COUNT(id) AS sortorder'],
+          where: 'uid = ? AND routineid = ?',
+          whereArgs: [
+            FirebaseAuth.instance.currentUser?.uid ?? 'null',
+            routineId,
+          ],
+        ))[0]['sortorder'] ??
+        1) as int;
+
+    return maxSortOrder;
   }
 
   static Future<void> _workoutCloudSet(WorkoutModel workout,
@@ -468,9 +561,9 @@ class Store {
       switch (row['operation']) {
         case 'insert':
           if (dbObject is RoutineModel) {
-            _routineCloudSet(dbObject).then((_) => success = true);
+            await _routineCloudSet(dbObject).then((_) => success = true);
           } else if (dbObject is WorkoutModel) {
-            _workoutCloudSet(dbObject).then((_) => success = true);
+            await _workoutCloudSet(dbObject).then((_) => success = true);
           }
           break;
         case 'delete':
@@ -480,8 +573,9 @@ class Store {
       if (success) {
         db.delete(
           TableNames.toBeUploaded,
-          where: 'primarykey = ?',
-          whereArgs: [row['primarykey']],
+          where:
+              'origin = ? AND operation = ? AND id = ? AND uid = ? AND extra = ?',
+          whereArgs: row.values.toList(),
         );
       }
     }

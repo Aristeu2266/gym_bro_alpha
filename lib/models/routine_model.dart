@@ -30,10 +30,12 @@ class RoutineModel extends DBObject with ChangeNotifier {
   }
 
   Future<void> update({String? name, String? description}) async {
-    _name = name ?? _name;
-    _description = description;
-    Store.updateRoutine(this);
-    notifyListeners();
+    if (name != _name || description != _description) {
+      _name = name ?? _name;
+      _description = description ?? _description;
+      Store.updateRoutine(this);
+      notifyListeners();
+    }
   }
 
   String get name {
@@ -75,6 +77,33 @@ class RoutineModel extends DBObject with ChangeNotifier {
 
   Future<void> addWorkout(String workoutName) async {
     workouts.add(await Store.newWorkout(workoutName, id));
+    notifyListeners();
+  }
+
+  // Future<void> deleteWorkout(int index) async {
+  //   workouts.removeAt(index);
+  // }
+
+  void reorderWorkout(int oldIndex, int newIndex) {
+    workouts.insert(newIndex, workouts.removeAt(oldIndex));
+
+    for (int i = 0; i < workouts.length; i++) {
+      workouts[i].sortOrder = i + 1;
+    }
+    workouts.sort((a, b) => a.sortOrder - b.sortOrder);
+
+    notifyListeners();
+  }
+
+  Future<void> load() async {
+    workouts = (await Store.localUserWorkouts(id))
+        .map((map) => WorkoutModel.mapToModel(map))
+        .toList();
+  }
+
+  Future<void> refresh() async {
+    await Store.refreshUserWorkouts(id);
+    await load();
     notifyListeners();
   }
 

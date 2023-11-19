@@ -10,9 +10,7 @@ class RoutineListModel with ChangeNotifier {
 
   Future<void> load() async {
     routines = (await Store.localUserRoutines)
-        .map(
-          (map) => RoutineModel.mapToModel(map),
-        )
+        .map((map) => RoutineModel.mapToModel(map))
         .toList();
   }
 

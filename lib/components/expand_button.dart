@@ -13,10 +13,10 @@ class ExpandButton extends StatefulWidget {
   final bool initialValue;
 
   @override
-  State<ExpandButton> createState() => _ExpandButtonState();
+  State<ExpandButton> createState() => ExpandButtonState();
 }
 
-class _ExpandButtonState extends State<ExpandButton>
+class ExpandButtonState extends State<ExpandButton>
     with SingleTickerProviderStateMixin {
   AnimationController? _turnController;
   Animation<double>? _turnAnimation;
@@ -48,10 +48,8 @@ class _ExpandButtonState extends State<ExpandButton>
     super.dispose();
   }
 
-  void _toggleExpand() {
-    setState(() {
-      _expanded = !_expanded;
-    });
+  void toggleExpand() {
+    _expanded = !_expanded;
     if (_expanded != widget.initialValue) {
       _turnController!.forward();
     } else {
@@ -63,7 +61,7 @@ class _ExpandButtonState extends State<ExpandButton>
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: _toggleExpand,
+      onPressed: toggleExpand,
       style: TextButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
