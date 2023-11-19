@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/models/routine_model.dart';
-import 'package:gym_bro_alpha/services/store.dart';
+import 'package:gym_bro_alpha/services/routine_store.dart';
 
 class RoutineListModel with ChangeNotifier {
   List<RoutineModel> routines = [];
@@ -9,25 +9,25 @@ class RoutineListModel with ChangeNotifier {
   RoutineListModel();
 
   Future<void> load() async {
-    routines = (await Store.localUserRoutines)
+    routines = (await RoutineStore.localUserRoutines)
         .map((map) => RoutineModel.mapToModel(map))
         .toList();
   }
 
   Future<void> refresh() async {
-    await Store.refreshUserRoutines();
+    await RoutineStore.refreshUserRoutines();
     await load();
     notifyListeners();
   }
 
   Future<void> add(String name, String? description) async {
-    routines.add(await Store.newRoutine(name, description));
+    routines.add(await RoutineStore.newRoutine(name, description));
 
     notifyListeners();
   }
 
   Future<void> delete(int index) async {
-    await Store.deleteRoutine(inactiveRoutines.removeAt(index));
+    await RoutineStore.deleteRoutine(inactiveRoutines.removeAt(index));
     await load();
 
     notifyListeners();

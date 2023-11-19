@@ -34,7 +34,7 @@ class RoutineListWidget extends StatelessWidget {
           key: ValueKey(routineList[index].id),
           borderRadius: BorderRadius.circular(12),
           child: Dismissible(
-            key: ValueKey(routineList[index].id),
+            key: ValueKey(routineList[index]),
             direction: active
                 ? DismissDirection.startToEnd
                 : DismissDirection.horizontal,

@@ -1,39 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/models/db_object.dart';
 import 'package:gym_bro_alpha/models/workout_model.dart';
-import 'package:gym_bro_alpha/services/store.dart';
+import 'package:gym_bro_alpha/services/routine_store.dart';
+import 'package:gym_bro_alpha/services/workout_store.dart';
 
 class RoutineModel extends DBObject with ChangeNotifier {
   final int id;
-  final String uid;
+  final String uId;
   late String _name;
   late bool _isActive;
   late int _sortOrder;
   String? _description;
   final DateTime creationDate;
-  List<WorkoutModel> workouts = [];
+  late List<WorkoutModel> workouts;
 
   RoutineModel({
     required this.id,
-    required this.uid,
+    required this.uId,
     required name,
     required bool isActive,
     required int sortOrder,
     String? description,
     required this.creationDate,
-    this.workouts = const [],
+    List<WorkoutModel>? workouts,
   }) {
     _name = name;
     _isActive = isActive;
     _sortOrder = sortOrder;
     _description = description;
+    this.workouts = workouts ?? [];
   }
 
   Future<void> update({String? name, String? description}) async {
     if (name != _name || description != _description) {
       _name = name ?? _name;
       _description = description ?? _description;
-      Store.updateRoutine(this);
+      RoutineStore.updateRoutine(this);
       notifyListeners();
     }
   }
@@ -44,7 +46,7 @@ class RoutineModel extends DBObject with ChangeNotifier {
 
   set name(String newName) {
     _name = newName;
-    Store.updateRoutine(this);
+    RoutineStore.updateRoutine(this);
     notifyListeners();
   }
 
@@ -58,8 +60,8 @@ class RoutineModel extends DBObject with ChangeNotifier {
 
   Future<bool> toggleIsActive() async {
     _isActive = !_isActive;
-    _sortOrder = (await Store.maxRoutineSortOrder(_isActive)) + 1;
-    Store.updateRoutine(this);
+    _sortOrder = (await RoutineStore.maxRoutineSortOrder(_isActive)) + 1;
+    RoutineStore.updateRoutine(this);
     notifyListeners();
     return _isActive;
   }
@@ -71,18 +73,20 @@ class RoutineModel extends DBObject with ChangeNotifier {
   set sortOrder(int newOrder) {
     assert(newOrder > 0);
     _sortOrder = newOrder;
-    Store.updateRoutine(this);
+    RoutineStore.updateRoutine(this);
     notifyListeners();
   }
 
   Future<void> addWorkout(String workoutName) async {
-    workouts.add(await Store.newWorkout(workoutName, id));
+    workouts.add(await WorkoutStore.newWorkout(workoutName, id));
     notifyListeners();
   }
 
-  // Future<void> deleteWorkout(int index) async {
-  //   workouts.removeAt(index);
-  // }
+  Future<void> deleteWorkout(int index) async {
+    await WorkoutStore.deleteWorkout(workouts.removeAt(index));
+    await load();
+    notifyListeners();
+  }
 
   void reorderWorkout(int oldIndex, int newIndex) {
     workouts.insert(newIndex, workouts.removeAt(oldIndex));
@@ -96,13 +100,13 @@ class RoutineModel extends DBObject with ChangeNotifier {
   }
 
   Future<void> load() async {
-    workouts = (await Store.localUserWorkouts(id))
+    workouts = (await WorkoutStore.localUserWorkouts(id))
         .map((map) => WorkoutModel.mapToModel(map))
         .toList();
   }
 
   Future<void> refresh() async {
-    await Store.refreshUserWorkouts(id);
+    await WorkoutStore.refreshUserWorkouts(id);
     await load();
     notifyListeners();
   }
@@ -110,7 +114,7 @@ class RoutineModel extends DBObject with ChangeNotifier {
   Map<String, Object?> toMap() {
     return {
       'id': id,
-      'uid': uid,
+      'uid': uId,
       'name': _name,
       'isactive': _isActive ? 1 : 0,
       'sortorder': _sortOrder,
@@ -122,7 +126,7 @@ class RoutineModel extends DBObject with ChangeNotifier {
   static RoutineModel mapToModel(Map<String, Object?> map) {
     return RoutineModel(
       id: map['id'] as int,
-      uid: map['uid'] as String,
+      uId: map['uid'] as String,
       name: map['name'] as String,
       isActive: (map['isactive'] as int) == 1 ? true : false,
       sortOrder: map['sortorder'] as int,
@@ -136,7 +140,7 @@ class RoutineModel extends DBObject with ChangeNotifier {
   Map<String, Object?> primaryKeys() {
     return {
       'id': id,
-      'uid': uid,
+      'uid': uId,
       'extra': 0,
     };
   }

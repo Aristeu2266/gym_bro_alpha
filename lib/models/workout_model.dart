@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/models/db_object.dart';
-import 'package:gym_bro_alpha/services/store.dart';
+import 'package:gym_bro_alpha/services/workout_store.dart';
 
 class WorkoutModel extends DBObject with ChangeNotifier {
   final int id;
@@ -31,7 +31,7 @@ class WorkoutModel extends DBObject with ChangeNotifier {
   set name(String s) {
     assert(s.isNotEmpty);
     _name = s;
-    Store.updateWorkout(this);
+    WorkoutStore.updateWorkout(this);
     notifyListeners();
   }
 
@@ -42,7 +42,7 @@ class WorkoutModel extends DBObject with ChangeNotifier {
   set sortOrder(int newOrder) {
     assert(newOrder > 0);
     _sortOrder = newOrder;
-    Store.updateWorkout(this);
+    WorkoutStore.updateWorkout(this);
     notifyListeners();
   }
 
@@ -73,7 +73,7 @@ class WorkoutModel extends DBObject with ChangeNotifier {
     return {
       'id': id,
       'uid': uId,
-      'extra': routineId,
+      'extra': 0,
     };
   }
 }

@@ -4,10 +4,9 @@ import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:provider/provider.dart';
 
 class WorkoutListTile extends StatefulWidget {
-  const WorkoutListTile(this.workout, {super.key});
+  const WorkoutListTile({super.key});
 
   // TODO: não está sendo usado
-  final WorkoutModel workout;
 
   @override
   State<WorkoutListTile> createState() => _WorkoutListTileState();
@@ -19,13 +18,12 @@ class _WorkoutListTileState extends State<WorkoutListTile> {
     return Consumer<WorkoutModel>(
       builder: (context, workout, child) => GestureDetector(
         onTap: () {
-          Navigator.pushNamed(context, PageRoutes.workout,
-              arguments: widget.workout);
+          Navigator.pushNamed(context, PageRoutes.workout, arguments: workout);
         },
         child: Card(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: ListTile(
-            title: Text(widget.workout.name),
+            title: Text(workout.name),
           ),
         ),
       ),

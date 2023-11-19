@@ -216,9 +216,91 @@ class _RoutinePageState extends State<RoutinePage> {
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
-                              return WorkoutTile(
-                                key: ValueKey(routine.workouts[index].id),
-                                workout: routine.workouts[index],
+                              return ClipRRect(
+                                key: ValueKey(routine.workouts[index]),
+                                borderRadius: BorderRadius.circular(12),
+                                child: Dismissible(
+                                  key: ValueKey(routine.workouts[index]),
+                                  direction: DismissDirection.startToEnd,
+                                  background: Container(
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 4),
+                                    padding: const EdgeInsets.only(left: 12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    alignment: Alignment.centerLeft,
+                                    child: const Icon(
+                                      Icons.delete,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  secondaryBackground: Container(
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 4),
+                                    padding: const EdgeInsets.only(right: 12),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.green,
+                                    ),
+                                    alignment: Alignment.centerRight,
+                                    child: const Icon(
+                                      Icons.add_circle,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  confirmDismiss: (direction) {
+                                    if (direction ==
+                                        DismissDirection.startToEnd) {
+                                      return showDialog<bool>(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: const Text('Are you sure?'),
+                                          content: Text(
+                                              'Delete permanently your "${routine.workouts[index].name}" routine and its data?'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context)
+                                                    .pop(false);
+                                              },
+                                              child: const Text('No'),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(true);
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8)),
+                                                backgroundColor:
+                                                    Theme.of(context)
+                                                        .colorScheme
+                                                        .errorContainer,
+                                                foregroundColor:
+                                                    Theme.of(context)
+                                                        .colorScheme
+                                                        .onErrorContainer,
+                                              ),
+                                              child: const Text('Yes'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      return Future.value(true);
+                                    }
+                                  },
+                                  onDismissed: (direction) {
+                                    setState(() {
+                                      routine.deleteWorkout(index);
+                                    });
+                                  },
+                                  child: WorkoutTile(
+                                      workout: routine.workouts[index]),
+                                ),
                               );
                             },
                           ),
@@ -429,87 +511,15 @@ class WorkoutTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Dismissible(
-        key: ValueKey(workout.id),
-        direction: DismissDirection.startToEnd,
-        background: Container(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          padding: const EdgeInsets.only(left: 12),
-          decoration: BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          alignment: Alignment.centerLeft,
-          child: const Icon(
-            Icons.delete,
-            color: Colors.white,
-          ),
-        ),
-        secondaryBackground: Container(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          padding: const EdgeInsets.only(right: 12),
-          decoration: const BoxDecoration(
-            color: Colors.green,
-          ),
-          alignment: Alignment.centerRight,
-          child: const Icon(
-            Icons.add_circle,
-            color: Colors.white,
-          ),
-        ),
-        confirmDismiss: (direction) {
-          if (direction == DismissDirection.startToEnd) {
-            return showDialog<bool>(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Are you sure?'),
-                content: Text(
-                    'Delete permanently your "${workout.name}" routine and its data?'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(false);
-                    },
-                    child: const Text('No'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(true);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                      backgroundColor:
-                          Theme.of(context).colorScheme.errorContainer,
-                      foregroundColor:
-                          Theme.of(context).colorScheme.onErrorContainer,
-                    ),
-                    child: const Text('Yes'),
-                  ),
-                ],
-              ),
-            );
-          } else {
-            return Future.value(true);
-          }
-        },
-        onDismissed: (direction) {
-          // TODO: apagar treino
-          // routineListModel.delete(index);
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Card(
-            margin: EdgeInsets.zero,
-            shape: const ContinuousRectangleBorder(),
-            child: InkWell(
-              onTap: () {},
-              child: ListTile(
-                title: Text(workout.name),
-              ),
-            ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Card(
+        margin: EdgeInsets.zero,
+        shape: const ContinuousRectangleBorder(),
+        child: InkWell(
+          onTap: () {},
+          child: ListTile(
+            title: Text(workout.name),
           ),
         ),
       ),
