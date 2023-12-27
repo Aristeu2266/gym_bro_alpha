@@ -183,8 +183,10 @@ class _AuthFormState extends State<AuthForm>
                 if (_isSignin())
                   GestureDetector(
                     onTap: () => Navigator.pushNamed(
-                        context, PageRoutes.resetPassword,
-                        arguments: _emailController.text),
+                      context,
+                      PageRoutes.resetPassword,
+                      arguments: _emailController.text,
+                    ),
                     child: const Text('Forgot password?'),
                   ),
               ],

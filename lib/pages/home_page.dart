@@ -36,6 +36,7 @@ class _HomePageState extends State<HomePage> {
       if (await Store.firstTimeUser) {
         await Store.loadUserData();
       }
+
       Connectivity().onConnectivityChanged.listen((result) {
         if (result != ConnectivityResult.none) {
           Store.uploadMissing();
@@ -44,6 +45,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     widget.refreshTheme(true);
+    Store.updateSignInDate(FirebaseAuth.instance.currentUser?.uid ?? 'null');
     await routineListModel.refresh();
   }
 

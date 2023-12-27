@@ -8,6 +8,8 @@ class MyFormField extends StatelessWidget {
     this.validator,
     this.onSaved,
     this.errorText,
+    this.contentPadding,
+    this.leading,
     super.key,
   });
 
@@ -17,6 +19,8 @@ class MyFormField extends StatelessWidget {
   final String? Function(String?)? validator;
   final Function(String?)? onSaved;
   final String? errorText;
+  final EdgeInsetsGeometry? contentPadding;
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
@@ -24,21 +28,22 @@ class MyFormField extends StatelessWidget {
 
     return TextFormField(
       decoration: InputDecoration(
-        errorMaxLines: 2,
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: colorScheme.background),
-        ),
-        focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: colorScheme.onBackground),
-            gapPadding: 0),
-        hintText: hintText,
-        hintStyle: TextStyle(
-          color: colorScheme.onPrimaryContainer,
-        ),
-        fillColor: colorScheme.primaryContainer,
-        filled: true,
-        errorText: errorText,
-      ),
+          errorMaxLines: 2,
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: colorScheme.background),
+          ),
+          focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: colorScheme.onBackground),
+              gapPadding: 0),
+          hintText: hintText,
+          hintStyle: TextStyle(
+            color: colorScheme.onPrimaryContainer,
+          ),
+          fillColor: colorScheme.primaryContainer,
+          filled: true,
+          errorText: errorText,
+          contentPadding: contentPadding,
+          prefixIcon: leading),
       controller: controller,
       obscureText: obscureText,
       validator: validator,

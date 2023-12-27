@@ -37,6 +37,7 @@ class DB {
     });
     await db.execute(_routinesTable);
     await db.execute(_workoutsTable);
+    await db.execute(_exercisesTable);
     await db.execute(_toBeUploaded);
   }
 
@@ -70,6 +71,18 @@ class DB {
       name TEXT NOT NULL,
       creationdate DATETIME NOT NULL,
       PRIMARY KEY (id, uId)
+    );
+  ''';
+
+  String get _exercisesTable => '''
+    CREATE TABLE ${TableNames.exercises} (
+      id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      primarymuscles TEXT NOT NULL,
+      secondarymuscles TEXT,
+      level TEXT,
+      videourl TEXT,
+      PRIMARY KEY (id)
     );
   ''';
 

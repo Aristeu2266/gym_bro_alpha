@@ -4,7 +4,9 @@ import 'package:gym_bro_alpha/exceptions/connection_exception.dart';
 import 'package:gym_bro_alpha/models/routine_model.dart';
 import 'package:gym_bro_alpha/models/workout_model.dart';
 import 'package:gym_bro_alpha/pages/add_button.dart';
+import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/utils.dart';
+import 'package:provider/provider.dart';
 
 class RoutinePage extends StatefulWidget {
   const RoutinePage({super.key});
@@ -298,8 +300,10 @@ class _RoutinePageState extends State<RoutinePage> {
                                       routine.deleteWorkout(index);
                                     });
                                   },
-                                  child: WorkoutTile(
-                                      workout: routine.workouts[index]),
+                                  child: ChangeNotifierProvider.value(
+                                    value: routine.workouts[index],
+                                    child: const WorkoutTile(),
+                                  ),
                                 ),
                               );
                             },
@@ -412,22 +416,23 @@ class _RoutinePageState extends State<RoutinePage> {
               }
 
               if (_isEditing && !_isDirty) {
+                // Entering edit mode
                 _titleFocus.requestFocus();
                 if (!_showDescription) {
                   _globalKey.currentState?.toggleExpand();
                 }
               } else {
+                // Saving title and description
                 if (_titleController.text.isEmpty) {
                   _titleController.text = routine.name;
                 }
                 routine.update(
-                    name: _titleController.text,
-                    description: _descriptionController.text);
+                  name: _titleController.text,
+                  description: _descriptionController.text,
+                );
                 FocusManager.instance.primaryFocus?.unfocus();
-                // setState(() {
                 _isDirty = false;
                 _isEditing = false;
-                // });
               }
             });
           },
@@ -462,8 +467,7 @@ class _RoutinePageState extends State<RoutinePage> {
                         color: Theme.of(context).colorScheme.onBackground,
                       ),
                     ),
-                    initialValue:
-                        false, //_descriptionController.text.isEmpty && _isEditing,
+                    initialValue: false,
                     callback: () {
                       setState(() {
                         _showDescription = !_showDescription;
@@ -504,22 +508,27 @@ class _RoutinePageState extends State<RoutinePage> {
 class WorkoutTile extends StatelessWidget {
   const WorkoutTile({
     super.key,
-    required this.workout,
   });
-
-  final WorkoutModel workout;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Card(
-        margin: EdgeInsets.zero,
-        shape: const ContinuousRectangleBorder(),
-        child: InkWell(
-          onTap: () {},
-          child: ListTile(
-            title: Text(workout.name),
+    return Consumer<WorkoutModel>(
+      builder: (context, workout, child) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Card(
+          margin: EdgeInsets.zero,
+          shape: const ContinuousRectangleBorder(),
+          child: InkWell(
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                PageRoutes.workout,
+                arguments: workout,
+              );
+            },
+            child: ListTile(
+              title: Text(workout.name),
+            ),
           ),
         ),
       ),

@@ -18,7 +18,6 @@ class VerifyEmailPage extends StatefulWidget {
 
 class _VerifyEmailPageState extends State<VerifyEmailPage>
     with SingleTickerProviderStateMixin {
-  User? currentUser;
   bool _isEmailVerified = false;
   bool _canResendEmail = true;
   Timer? timer;
@@ -32,11 +31,11 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
   @override
   void initState() {
     super.initState();
-    currentUser = FirebaseAuth.instance.currentUser!;
 
-    _isEmailVerified =
-        currentUser!.isAnonymous ? true : currentUser!.emailVerified;
-
+    _isEmailVerified = FirebaseAuth.instance.currentUser!.isAnonymous
+        ? true
+        : FirebaseAuth.instance.currentUser!.emailVerified;
+    if (_isEmailVerified) return;
     if (!_isEmailVerified) {
       _sendVerificationEmail();
 
@@ -71,7 +70,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
 
   Future<void> checkEmailVerified() async {
     try {
-      await currentUser!.reload();
+      await FirebaseAuth.instance.currentUser!.reload();
 
       setState(() {
         _isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
@@ -103,7 +102,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
       setState(() {});
     });
 
-    await currentUser!.sendEmailVerification().catchError(
+    await FirebaseAuth.instance.currentUser!.sendEmailVerification().catchError(
       (e) {
         if (mounted) {
           Utils.showSnackbar(context, 'Too many attempts');

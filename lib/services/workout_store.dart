@@ -199,6 +199,20 @@ class WorkoutStore {
     return workoutDoc.delete();
   }
 
+  static Future<void> dropRoutine(int routineId) async {
+    db = await DB.instance.database;
+
+    final workouts = await db.query(
+      TableNames.workouts,
+      where: 'uid = ? AND routineid = ?',
+      whereArgs: [FirebaseAuth.instance.currentUser?.uid ?? 'null', routineId],
+    );
+
+    for (Map<String, Object?> workout in workouts) {
+      deleteWorkout(WorkoutModel.mapToModel(workout));
+    }
+  }
+
   static Future<int> maxWorkoutSortOrder(int routineId) async {
     db = await DB.instance.database;
 

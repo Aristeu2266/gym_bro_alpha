@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gym_bro_alpha/models/routine_list_model.dart';
+import 'package:gym_bro_alpha/pages/exercise_page.dart';
 import 'package:gym_bro_alpha/pages/routine_page.dart';
 import 'package:gym_bro_alpha/services/local_storage.dart';
 import 'package:gym_bro_alpha/pages/auth_page.dart';
@@ -39,7 +40,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late Database db;
-  int themeSelected = 2;
+  int? themeSelected;
 
   @override
   void initState() {
@@ -109,16 +110,18 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Gym Bro Alpha',
-        theme: ThemeData(
-          colorScheme: CustomSchemes.greyScheme(themeSelected != 2
-              ? Brightness.values[themeSelected]
-              : Brightness.light),
-          brightness: themeSelected != 2
-              ? Brightness.values[themeSelected]
-              : Brightness.light,
-          useMaterial3: true,
-          fontFamily: 'Roboto',
-        ),
+        theme: themeSelected != null
+            ? ThemeData(
+                colorScheme: CustomSchemes.greyScheme(themeSelected != 2
+                    ? Brightness.values[themeSelected!]
+                    : Brightness.light),
+                brightness: themeSelected != 2
+                    ? Brightness.values[themeSelected!]
+                    : Brightness.light,
+                useMaterial3: true,
+                fontFamily: 'Roboto',
+              )
+            : null,
         darkTheme: themeSelected == 2
             ? ThemeData(
                 colorScheme: CustomSchemes.greyScheme(Brightness.dark),
@@ -128,16 +131,20 @@ class _MyAppState extends State<MyApp> {
               )
             : null,
         routes: {
-          PageRoutes.root: (_) => AuthPage(refreshTheme: loadTheme),
+          // TODO: Loading page
+          PageRoutes.root: (_) => themeSelected == null
+              ? const Text('Loading')
+              : AuthPage(refreshTheme: loadTheme),
           PageRoutes.login: (_) => const LoginPage(),
           PageRoutes.signup: (_) => const SignupPage(),
           PageRoutes.resetPassword: (_) => const ResetPasswordPage(),
           PageRoutes.home: (_) => HomePage(refreshTheme: loadTheme),
           PageRoutes.settings: (_) => SettingsPage(
-              themeSelected: themeSelected,
+              themeSelected: themeSelected ?? 2,
               handleThemeSelect: handleThemeSelect),
           PageRoutes.routine: (_) => const RoutinePage(),
           PageRoutes.workout: (_) => const WorkoutPage(),
+          PageRoutes.exercise: (_) => const ExercisePage(),
         },
       ),
     );

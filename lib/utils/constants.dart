@@ -19,12 +19,14 @@ class PageRoutes {
   static const settings = '/settings';
   static const routine = '/routine';
   static const workout = '/workout';
+  static const exercise = '/exercise';
 }
 
 class TableNames {
   static const userPrefs = 'user_prefs';
   static const routines = 'routines';
   static const workouts = 'workouts';
+  static const exercises = 'exercises';
   static const toBeUploaded = 'to_be_uploaded';
 }
 

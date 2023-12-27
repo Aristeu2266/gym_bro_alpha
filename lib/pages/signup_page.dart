@@ -4,7 +4,6 @@ import 'package:gym_bro_alpha/components/auth_form.dart';
 import 'package:gym_bro_alpha/components/sign_bottom_text.dart';
 import 'package:gym_bro_alpha/pages/login_page.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
-import 'package:gym_bro_alpha/services/store.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/utils.dart';
 
@@ -179,13 +178,9 @@ class _SignupPageState extends State<SignupPage>
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    await Store.updateSignInDate('null').then(
-                                      (_) {
-                                        Navigator.pushReplacementNamed(
-                                          context,
-                                          PageRoutes.home,
-                                        );
-                                      },
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      PageRoutes.home,
                                     );
                                   },
                                   style: ElevatedButton.styleFrom(

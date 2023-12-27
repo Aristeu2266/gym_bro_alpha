@@ -16,6 +16,10 @@ class AuthPage extends StatelessWidget {
         if (snapshot.hasData) {
           return VerifyEmailPage(refreshTheme: refreshTheme);
         } else {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // TODO: loading page
+            return const Text('Loading2');
+          }
           return const LoginPage();
         }
       },

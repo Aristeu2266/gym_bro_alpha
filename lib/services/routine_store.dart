@@ -202,6 +202,8 @@ class RoutineStore {
       whereArgs: [routine.id, routine.uId],
     );
 
+    WorkoutStore.dropRoutine(routine.id);
+
     final connectivity = await Connectivity().checkConnectivity();
     if (FirebaseAuth.instance.currentUser != null) {
       if (connectivity != ConnectivityResult.none) {
