@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/models/routine_model.dart';
@@ -12,12 +13,15 @@ class RoutineListModel with ChangeNotifier {
     routines = (await RoutineStore.localUserRoutines)
         .map((map) => RoutineModel.mapToModel(map))
         .toList();
+
+    notifyListeners();
   }
 
   Future<void> refresh() async {
-    await RoutineStore.refreshUserRoutines();
+    if (FirebaseAuth.instance.currentUser != null) {
+      await RoutineStore.refreshUserRoutines();
+    }
     await load();
-    notifyListeners();
   }
 
   Future<void> add(String name, String? description) async {

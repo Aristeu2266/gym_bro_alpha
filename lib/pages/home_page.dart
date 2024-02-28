@@ -32,6 +32,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _init() async {
+    await Store.loadExerciseData();
+
     if (FirebaseAuth.instance.currentUser != null) {
       if (await Store.firstTimeUser) {
         await Store.loadUserData();
@@ -44,7 +46,7 @@ class _HomePageState extends State<HomePage> {
       });
     }
 
-    widget.refreshTheme(true);
+    await widget.refreshTheme(true);
     Store.updateSignInDate(FirebaseAuth.instance.currentUser?.uid ?? 'null');
     await routineListModel.refresh();
   }

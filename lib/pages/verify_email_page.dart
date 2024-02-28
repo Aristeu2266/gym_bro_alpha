@@ -64,7 +64,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
     resendWait?.ignore();
     timer?.cancel();
     resendTimer?.cancel();
-    _controller!.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 

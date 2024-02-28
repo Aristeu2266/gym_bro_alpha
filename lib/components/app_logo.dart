@@ -23,23 +23,23 @@ class AppLogo extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(
-          CustomIcons.dumbell,
+          CustomIcons.logo,
           size: iconSize,
           color: color,
         ),
         if (showText)
-        SizedBox(
-          width: gap,
-        ),
-        if (showText)
-        DefaultTextStyle(
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: fontSize,
-            color: color,
+          SizedBox(
+            width: gap,
           ),
-          child: const Text('GymBro'),
-        ),
+        if (showText)
+          DefaultTextStyle(
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: fontSize,
+              color: color,
+            ),
+            child: const Text('GymBro'),
+          ),
       ],
     );
   }

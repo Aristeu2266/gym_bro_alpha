@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/models/db_object.dart';
 import 'package:gym_bro_alpha/models/workout_model.dart';
@@ -103,12 +104,15 @@ class RoutineModel extends DBObject with ChangeNotifier {
     workouts = (await WorkoutStore.localUserWorkouts(id))
         .map((map) => WorkoutModel.mapToModel(map))
         .toList();
+
+    notifyListeners();
   }
 
   Future<void> refresh() async {
-    await WorkoutStore.refreshUserWorkouts(id);
+    if (FirebaseAuth.instance.currentUser != null) {
+      await WorkoutStore.refreshUserWorkouts(id);
+    }
     await load();
-    notifyListeners();
   }
 
   Map<String, Object?> toMap() {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_bro_alpha/utils/custom_icons.dart';
 
 enum ScreenSelected {
   statistics(0, Icon(Icons.bar_chart)),
@@ -8,6 +9,16 @@ enum ScreenSelected {
   const ScreenSelected(this.value, this.icon);
   final int value;
   final Icon icon;
+}
+
+enum FilterPages {
+  type('Type', CustomIcons.type),
+  equipment('Equipment', CustomIcons.equipment),
+  muscle('Muscles', CustomIcons.muscles);
+
+  const FilterPages(this.label, this.iconData);
+  final String label;
+  final IconData iconData;
 }
 
 class PageRoutes {
@@ -20,6 +31,7 @@ class PageRoutes {
   static const routine = '/routine';
   static const workout = '/workout';
   static const exercise = '/exercise';
+  static const filter = '/filter';
 }
 
 class TableNames {
@@ -34,4 +46,5 @@ class CollectionNames {
   static const users = 'users';
   static const routines = 'routines';
   static const workouts = 'workouts';
+  static const exercises = 'exercises';
 }

@@ -1,6 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:gym_bro_alpha/components/exercise_widget.dart';
 import 'package:gym_bro_alpha/components/my_form_field.dart';
-import 'package:gym_bro_alpha/utils/custom_icons.dart';
+import 'package:gym_bro_alpha/services/exercise_store.dart';
+import 'package:gym_bro_alpha/utils/constants.dart';
+
+const params = {
+  "type": null,
+  "equipment": null,
+  "muscles": null,
+};
+
+final teste = StreamController<Map<String, dynamic>>();
 
 class ExercisePage extends StatefulWidget {
   const ExercisePage({super.key});
@@ -10,15 +22,29 @@ class ExercisePage extends StatefulWidget {
 }
 
 class _ExercisePageState extends State<ExercisePage> {
+  List? exercises;
+
+  @override
+  void initState() {
+    super.initState();
+    ExerciseStore.localExercises.then((value) {
+      setState(() {
+        exercises = value;
+        // print(exercises);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(8, 20, 8, 0),
+            padding: const EdgeInsets.all(8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
               children: [
                 Row(
                   children: [
@@ -45,35 +71,36 @@ class _ExercisePageState extends State<ExercisePage> {
                   ],
                 ),
                 const SizedBox(height: 4),
-                Row(
+                const Row(
                   children: [
                     Expanded(
-                      child: FilterButton(
-                        label: 'filter',
-                        icon: Icons.sports_gymnastics,
-                      ),
+                      child: FilterButton(FilterPages.type),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Expanded(
-                      child: FilterButton(
-                        label: '💪 a',
-                        icon: CustomIcons.dumbell,
-                      ),
+                      child: FilterButton(FilterPages.equipment),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        onPressed: () {},
-                        child: const Text('filter'),
-                      ),
+                      child: FilterButton(FilterPages.muscle),
                     ),
                   ],
                 ),
+                const SizedBox(height: 4),
+                if (exercises != null)
+                  Expanded(
+                    child: ListView.separated(
+                      // physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: exercises!.length,
+                      itemBuilder: (context, index) {
+                        return ExerciseWidget(exercises![index]);
+                      },
+                      separatorBuilder: (context, index) {
+                        return const Divider();
+                      },
+                    ),
+                  ),
               ],
             ),
           ),
@@ -83,15 +110,19 @@ class _ExercisePageState extends State<ExercisePage> {
   }
 }
 
-class FilterButton extends StatelessWidget {
-  const FilterButton({
-    required this.label,
-    this.icon,
-    super.key,
-  });
+class ExerciseTile extends StatelessWidget {
+  const ExerciseTile({super.key});
 
-  final String label;
-  final IconData? icon;
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+
+class FilterButton extends StatelessWidget {
+  const FilterButton(this.filter, {super.key});
+
+  final FilterPages filter;
 
   @override
   Widget build(BuildContext context) {
@@ -100,16 +131,24 @@ class FilterButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
+        padding: EdgeInsets.zero,
       ),
-      onPressed: () {},
+      onPressed: () {
+        Navigator.pushNamed(
+          context,
+          PageRoutes.filter,
+          arguments: filter,
+        );
+      },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (icon != null) ...[
-            Icon(icon),
-            const SizedBox(width: 2),
-          ],
-          Text(label),
+          Icon(
+            filter.iconData,
+            size: 25,
+          ),
+          const SizedBox(width: 4),
+          Text(filter.label),
         ],
       ),
     );

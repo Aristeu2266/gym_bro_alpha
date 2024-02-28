@@ -33,7 +33,6 @@ class DB {
     await db.insert(TableNames.userPrefs, {
       'uid': 'null',
       'theme': 2,
-      'lastlogin': DateTime.now().toIso8601String(),
     });
     await db.execute(_routinesTable);
     await db.execute(_workoutsTable);
@@ -45,7 +44,7 @@ class DB {
     CREATE TABLE ${TableNames.userPrefs} (
       uid TEXT PRIMARY KEY,
       theme INTEGER,
-      lastlogin DATETIME NOT NULL
+      lastlogin DATETIME
     );
   ''';
 
@@ -78,10 +77,14 @@ class DB {
     CREATE TABLE ${TableNames.exercises} (
       id INTEGER NOT NULL,
       name TEXT NOT NULL,
+      system BOOLEAN NOT NULL,
+      category TEXT NOT NULL,
       primarymuscles TEXT NOT NULL,
       secondarymuscles TEXT,
       level TEXT,
       videourl TEXT,
+      equipment TEXT,
+      possiblenames TEXT,
       PRIMARY KEY (id)
     );
   ''';

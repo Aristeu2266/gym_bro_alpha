@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gym_bro_alpha/models/db_object.dart';
@@ -30,6 +32,19 @@ class Store {
         ]);
 
     return row.isNotEmpty ? (row[0]['uid'] ?? 'null') as String : 'null';
+  }
+
+  static Future<String> get latestLogin async {
+    db = await DB.instance.database;
+
+    final mostRecent = await db.query(
+      TableNames.userPrefs,
+      columns: ['MAX(lastlogin) AS lastlogin'],
+    );
+
+    return mostRecent.isNotEmpty
+        ? (mostRecent[0]['lastlogin'] ?? 'null') as String
+        : 'null';
   }
 
   static Future<bool> get firstTimeUser async {
@@ -88,6 +103,43 @@ class Store {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }
+  }
+
+  static Future<void> loadExerciseData() async {
+    db = await DB.instance.database;
+
+    final groups = (await FirebaseFirestore.instance
+            .collection(CollectionNames.exercises)
+            .get())
+        .docs
+        .map((doc) => doc.data())
+        .toList();
+
+    final String lastLogin = await latestLogin;
+
+    for (Map<String, dynamic> group in groups) {
+      if (lastLogin == 'null' ||
+          DateTime.parse(group['lastUpdate'])
+              .isAfter(DateTime.parse(lastLogin))) {
+        for (Map<String, dynamic> exercise in group['exercises']) {
+          db.insert(
+            TableNames.exercises,
+            _cloudExerciseToDB(exercise),
+          );
+        }
+      }
+    }
+  }
+
+  static Map<String, dynamic> _cloudExerciseToDB(
+      Map<String, dynamic> exercise) {
+    for (String element in exercise.keys) {
+      if (exercise[element] is List) {
+        exercise[element] = jsonEncode(exercise[element]);
+      }
+    }
+
+    return exercise;
   }
 
   static Future<int> updateSignInDate(String uid) async {

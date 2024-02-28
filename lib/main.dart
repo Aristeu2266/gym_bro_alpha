@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gym_bro_alpha/models/routine_list_model.dart';
 import 'package:gym_bro_alpha/pages/exercise_page.dart';
+import 'package:gym_bro_alpha/pages/filter_page.dart';
 import 'package:gym_bro_alpha/pages/routine_page.dart';
 import 'package:gym_bro_alpha/services/local_storage.dart';
 import 'package:gym_bro_alpha/pages/auth_page.dart';
@@ -79,7 +80,6 @@ class _MyAppState extends State<MyApp> {
         {
           'uId': FirebaseAuth.instance.currentUser?.uid ?? 'null',
           'theme': 2,
-          'lastLogin': DateTime.now().toIso8601String(),
         },
       ).catchError((_) {
         return 0;
@@ -140,11 +140,13 @@ class _MyAppState extends State<MyApp> {
           PageRoutes.resetPassword: (_) => const ResetPasswordPage(),
           PageRoutes.home: (_) => HomePage(refreshTheme: loadTheme),
           PageRoutes.settings: (_) => SettingsPage(
-              themeSelected: themeSelected ?? 2,
-              handleThemeSelect: handleThemeSelect),
+                themeSelected: themeSelected ?? 2,
+                handleThemeSelect: handleThemeSelect,
+              ),
           PageRoutes.routine: (_) => const RoutinePage(),
           PageRoutes.workout: (_) => const WorkoutPage(),
           PageRoutes.exercise: (_) => const ExercisePage(),
+          PageRoutes.filter: (_) => const FilterPage(),
         },
       ),
     );
