@@ -83,6 +83,7 @@ class DB {
       secondarymuscles TEXT,
       level TEXT,
       videourl TEXT,
+      imageurl TEXT,
       equipment TEXT,
       possiblenames TEXT,
       PRIMARY KEY (id)

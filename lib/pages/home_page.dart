@@ -22,6 +22,7 @@ class _HomePageState extends State<HomePage> {
   late PageController pageController;
   late RoutineListModel routineListModel =
       Provider.of<RoutineListModel>(context, listen: false);
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -33,6 +34,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _init() async {
     await Store.loadExerciseData();
+    _isLoading = false;
 
     if (FirebaseAuth.instance.currentUser != null) {
       if (await Store.firstTimeUser) {
@@ -85,25 +87,28 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBar(),
-      body: PageView(
-        controller: pageController,
-        onPageChanged: (value) => setState(() => screenIndex = value),
-        children: [
-          Column(
-            children: [
-              Expanded(
-                child: IconButton(
-                  icon: const Icon(Icons.bar_chart),
-                  onPressed: () {},
+      // TODO: Loading Page
+      body: _isLoading
+          ? const Text('Loading3')
+          : PageView(
+              controller: pageController,
+              onPageChanged: (value) => setState(() => screenIndex = value),
+              children: [
+                Column(
+                  children: [
+                    Expanded(
+                      child: IconButton(
+                        icon: const Icon(Icons.bar_chart),
+                        onPressed: () {},
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          const StartPage(),
-          //const WorkoutListPage(),
-          const RoutineListPage(),
-        ],
-      ),
+                const StartPage(),
+                //const WorkoutListPage(),
+                const RoutineListPage(),
+              ],
+            ),
       extendBody: false,
       bottomNavigationBar: NavigationBar(
         selectedIndex: screenIndex,

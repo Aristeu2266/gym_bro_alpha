@@ -108,7 +108,8 @@ class FilterList extends StatelessWidget {
                 : EquipmentFilters.values[index].iconData,
           )
         : Image.asset(
-            'assets/images/muscles/${Muscles.values[index].name}.png');
+            'assets/images/muscles/${Muscles.values[index].name}.png',
+          );
   }
 
   @override

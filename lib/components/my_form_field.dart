@@ -10,6 +10,7 @@ class MyFormField extends StatelessWidget {
     this.errorText,
     this.contentPadding,
     this.leading,
+    this.onChanged,
     super.key,
   });
 
@@ -21,6 +22,7 @@ class MyFormField extends StatelessWidget {
   final String? errorText;
   final EdgeInsetsGeometry? contentPadding;
   final Widget? leading;
+  final void Function(String)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +50,7 @@ class MyFormField extends StatelessWidget {
       obscureText: obscureText,
       validator: validator,
       onSaved: onSaved,
+      onChanged: onChanged,
     );
   }
 }

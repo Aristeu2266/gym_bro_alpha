@@ -44,4 +44,14 @@ class ExerciseModel {
           : null,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ExerciseModel &&
+        other.runtimeType == runtimeType &&
+        other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/components/exercise_widget.dart';
 import 'package:gym_bro_alpha/components/my_form_field.dart';
+import 'package:gym_bro_alpha/models/exercise_model.dart';
 import 'package:gym_bro_alpha/services/exercise_store.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
 
@@ -22,16 +23,35 @@ class ExercisePage extends StatefulWidget {
 }
 
 class _ExercisePageState extends State<ExercisePage> {
-  List? exercises;
+  List<ExerciseModel>? exercises;
+  List<ExerciseModel>? filteredExercises;
 
   @override
   void initState() {
     super.initState();
     ExerciseStore.localExercises.then((value) {
       setState(() {
-        exercises = value;
+        exercises = value.toSet().toList();
+        filteredExercises = exercises;
         // print(exercises);
       });
+    });
+  }
+
+  void onChanged(String text) {
+    text = text.toLowerCase();
+
+    setState(() {
+      filteredExercises = exercises
+          ?.where(
+            (element) =>
+                element.name.toLowerCase().contains(text) ||
+                element.category.toLowerCase().contains(text) ||
+                element.primaryMuscles
+                    .map((e) => e.toLowerCase())
+                    .contains(text),
+          )
+          .toList();
     });
   }
 
@@ -48,14 +68,15 @@ class _ExercisePageState extends State<ExercisePage> {
               children: [
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       flex: 17,
                       child: MyFormField(
-                        contentPadding: EdgeInsets.symmetric(
+                        contentPadding: const EdgeInsets.symmetric(
                           horizontal: 4,
                           vertical: 0,
                         ),
-                        leading: Icon(Icons.search),
+                        leading: const Icon(Icons.search),
+                        onChanged: onChanged,
                       ),
                     ),
                     const SizedBox(width: 4),
@@ -87,14 +108,14 @@ class _ExercisePageState extends State<ExercisePage> {
                   ],
                 ),
                 const SizedBox(height: 4),
-                if (exercises != null)
+                if (filteredExercises != null)
                   Expanded(
                     child: ListView.separated(
                       // physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: exercises!.length,
+                      itemCount: filteredExercises!.length,
                       itemBuilder: (context, index) {
-                        return ExerciseWidget(exercises![index]);
+                        return ExerciseWidget(filteredExercises![index]);
                       },
                       separatorBuilder: (context, index) {
                         return const Divider();
