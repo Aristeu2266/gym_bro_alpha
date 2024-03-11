@@ -10,13 +10,12 @@ class CustomSchemes {
     ColorScheme newScheme = brightness == Brightness.light
         ? colorScheme.copyWith(
             primary: colorScheme.secondary,
-            onPrimary: colorScheme.onSecondary,
+            onPrimary: colorScheme.inversePrimary, //colorScheme.onSecondary,
             primaryContainer: colorScheme.secondaryContainer,
             onPrimaryContainer: colorScheme.onSecondaryContainer,
             secondary: Colors.white,
             onSecondary: const Color(0xff1c1b1e),
-            inversePrimary: colorScheme.inverseSurface
-          )
+            inversePrimary: colorScheme.inverseSurface)
         : colorScheme.copyWith(
             primary: colorScheme.secondary,
             onPrimary: colorScheme.onSecondary,
@@ -24,18 +23,8 @@ class CustomSchemes {
             onPrimaryContainer: colorScheme.onSecondaryContainer,
             secondary: Colors.white,
             onSecondary: const Color(0xff1c1b1e),
-            inversePrimary: colorScheme.inverseSurface
-          );
+            inversePrimary: colorScheme.inverseSurface);
 
     return newScheme;
-  }
-
-  static ThemeData grey(Brightness brightness) {
-    ThemeData themeData = ThemeData(
-      brightness: brightness,
-      colorScheme: greyScheme(brightness),
-    );
-
-    return themeData;
   }
 }
