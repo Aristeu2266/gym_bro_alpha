@@ -51,7 +51,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
   }
 
   void addWorkout() {
-    Navigator.pushNamed(context, PageRoutes.exercise);
+    Navigator.pushNamed(context, PageRoutes.addExercise);
   }
 
   void _onReorder(int oldIndex, int newIndex) {

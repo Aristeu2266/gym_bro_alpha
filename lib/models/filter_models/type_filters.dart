@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/models/filter_models/filter_model.dart';
 import 'package:gym_bro_alpha/models/filter_models/filter_options.dart';
 import 'package:gym_bro_alpha/utils/custom_icons.dart';
@@ -8,35 +7,35 @@ class TypeFilters extends FilterOptions {
   List<FilterModel> get values => [
         FilterModel(
           'All',
-          pic: const Icon(CustomIcons.all),
+          icon: CustomIcons.all,
         ),
         FilterModel(
           'Strength',
-          pic: const Icon(CustomIcons.strength),
+          icon: CustomIcons.strength,
         ),
         FilterModel(
           'Stretching',
-          pic: const Icon(CustomIcons.stretching),
+          icon: CustomIcons.stretching,
         ),
         FilterModel(
           'Powerlifting',
-          pic: const Icon(CustomIcons.powerlifting),
+          icon: CustomIcons.powerlifting,
         ),
         FilterModel(
           'Cardio',
-          pic: const Icon(CustomIcons.cardio),
+          icon: CustomIcons.cardio,
         ),
         FilterModel(
           'Strongman',
-          pic: const Icon(CustomIcons.strongman),
+          icon: CustomIcons.strongman,
         ),
         FilterModel(
-          'Olympic Weightlifting',
-          pic: const Icon(CustomIcons.olympicweightlifting),
+          'Olymicon Weightlifting',
+          icon: CustomIcons.olympicweightlifting,
         ),
         FilterModel(
           'Plyometrics',
-          pic: const Icon(CustomIcons.plyometrics),
+          icon: CustomIcons.plyometrics,
         ),
       ];
 }

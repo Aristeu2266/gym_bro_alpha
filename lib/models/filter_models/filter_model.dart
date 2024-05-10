@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 
 class FilterModel {
   final String label;
-  final Widget? pic;
+  Widget? pic;
+  final IconData? icon;
 
-  FilterModel(this.label, {required this.pic});
+  FilterModel(this.label, {this.pic, this.icon}) {
+    if (pic == null && icon != null) {
+      pic = Icon(icon);
+    }
+  }
 }

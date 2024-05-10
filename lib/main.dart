@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gym_bro_alpha/models/routine_list_model.dart';
+import 'package:gym_bro_alpha/pages/add_exercises_page.dart';
 import 'package:gym_bro_alpha/pages/exercise_page.dart';
 import 'package:gym_bro_alpha/pages/filter_page.dart';
 import 'package:gym_bro_alpha/pages/routine_page.dart';
@@ -145,8 +146,9 @@ class _MyAppState extends State<MyApp> {
               ),
           PageRoutes.routine: (_) => const RoutinePage(),
           PageRoutes.workout: (_) => const WorkoutPage(),
-          PageRoutes.exercise: (_) => const ExercisePage(),
+          PageRoutes.addExercise: (_) => const AddExercisesPage(),
           PageRoutes.filter: (_) => const FilterPage(),
+          PageRoutes.exercise: (_) => const ExercisePage(),
         },
       ),
     );

@@ -23,10 +23,21 @@ class DB {
   _initDatabase() async {
     return await openDatabase(
       join(await getDatabasesPath(), 'gymbro.db'),
-      version: 1,
+      version: 3,
       onCreate: _onCreate,
+      // onUpgrade: _testeUpgrade,
     );
   }
+
+  // _testeUpgrade(Database db, int oldVersion, int newVersion) {
+  //   print('new version $newVersion');
+  //   print('old version $oldVersion');
+  //   try {
+  //     db.execute("ALTER TABLE ${TableNames.exercises} ADD COLUMN namept TEXT");
+  //   } catch (e) {
+  //     print("Altering ${TableNames.exercises}: ${e.toString()}");
+  //   }
+  // }
 
   _onCreate(Database db, int versao) async {
     await db.execute(_userPrefsTable);

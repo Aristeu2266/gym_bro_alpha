@@ -117,6 +117,14 @@ class Store {
 
     final String lastLogin = await latestLogin;
 
+    final List<String> exerciseSchema = (await db.rawQuery(
+      'PRAGMA table_info(${TableNames.exercises})',
+    ))
+        .map(
+          (e) => e['name'] as String,
+        )
+        .toList();
+
     for (Map<String, dynamic> group in groups) {
       if (lastLogin == 'null' ||
           DateTime.parse(group['lastUpdate'])
@@ -124,7 +132,7 @@ class Store {
         for (Map<String, dynamic> exercise in group['exercises']) {
           db.insert(
             TableNames.exercises,
-            _cloudExerciseToDB(exercise),
+            _cloudExerciseToDB(exercise, exerciseSchema),
           );
         }
       }
@@ -132,8 +140,10 @@ class Store {
   }
 
   static Map<String, dynamic> _cloudExerciseToDB(
-      Map<String, dynamic> exercise) {
-    for (String element in exercise.keys) {
+    Map<String, dynamic> exercise,
+    List<String> exerciseSchema,
+  ) {
+    for (String element in exerciseSchema) {
       if (exercise[element] is List) {
         exercise[element] = jsonEncode(exercise[element]);
       }

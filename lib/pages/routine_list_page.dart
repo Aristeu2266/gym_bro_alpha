@@ -138,12 +138,10 @@ class _RoutineListPageState extends State<RoutineListPage> {
             (_) {
               bool A = scrollNotification.metrics.atEdge;
               bool B = scrollNotification.metrics.pixels == 0;
-              bool C = _showInactive;
-              bool D = _showActive;
               bool E = scrollNotification.metrics.maxScrollExtent == 0.0;
               // some piece of boolean monstrosity only cause I had fun doing it lol
               setState(() {
-                if (E || (A && !B && !C && D) || (A && B && C & !D)) {
+                if (E || (A && !B)) {
                   _isScrollEnd = true;
                 } else {
                   _isScrollEnd = false;

@@ -30,8 +30,9 @@ class PageRoutes {
   static const settings = '/settings';
   static const routine = '/routine';
   static const workout = '/workout';
-  static const exercise = '/exercise';
+  static const addExercise = '/add-exercise';
   static const filter = '/filter';
+  static const exercise = '/exercise';
 }
 
 class TableNames {

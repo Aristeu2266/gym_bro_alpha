@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_bro_alpha/pages/color_palette_test_page.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
 import 'package:gym_bro_alpha/services/local_storage.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
@@ -35,6 +36,37 @@ class SettingsPage extends StatelessWidget {
                 screenSize: screenSize,
               ),
             ),
+
+            // TEMPORARY BUTTON FOR DEBUG ONLY!!! TODO: DELETE LATER
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const ColorPaletteTestPage(),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.onInverseSurface,
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                alignment: const AlignmentDirectional(-1, 0),
+                padding: const EdgeInsets.only(left: 12),
+              ),
+              icon: const Icon(
+                Icons.color_lens,
+                color: Colors.orange,
+              ),
+              label: const Text(
+                'Color Palette Test Page',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
 
             // TEMPORARY BUTTON FOR DEBUG ONLY!!! TODO: DELETE LATER
             ElevatedButton.icon(

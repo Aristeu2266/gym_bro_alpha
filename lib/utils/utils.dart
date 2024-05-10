@@ -11,4 +11,8 @@ class Utils {
       ),
     );
   }
+
+  static String capitalize(String text) {
+    return text.replaceRange(0, 1, text.substring(0, 1).toUpperCase());
+  }
 }

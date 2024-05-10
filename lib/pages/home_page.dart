@@ -110,17 +110,21 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
       extendBody: false,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: screenIndex,
-        destinations: ScreenSelected.values
-            .map(
-              (e) => NavigationDestination(
-                icon: e.icon,
-                label: e.name,
-              ),
-            )
-            .toList(),
-        onDestinationSelected: (value) => handleScreenChanged(value),
+      bottomNavigationBar: AnimatedContainer(
+        duration: const Duration(milliseconds: 500),
+        height: _isLoading ? 0 : 80,
+        child: NavigationBar(
+          selectedIndex: screenIndex,
+          destinations: ScreenSelected.values
+              .map(
+                (e) => NavigationDestination(
+                  icon: e.icon,
+                  label: e.name,
+                ),
+              )
+              .toList(),
+          onDestinationSelected: (value) => handleScreenChanged(value),
+        ),
       ),
     );
   }

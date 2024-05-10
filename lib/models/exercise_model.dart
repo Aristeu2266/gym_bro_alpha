@@ -7,6 +7,7 @@ class ExerciseModel {
   final String category;
   final List<String> primaryMuscles;
   final List<String>? secondaryMuscles;
+  final String? namePt;
   final String? level;
   final String? videoUrl;
   final String? equipment;
@@ -19,6 +20,7 @@ class ExerciseModel {
     required this.category,
     required this.primaryMuscles,
     this.secondaryMuscles,
+    this.namePt,
     this.level,
     this.videoUrl,
     this.equipment,
@@ -36,6 +38,7 @@ class ExerciseModel {
       secondaryMuscles: map['secondarymuscles'] != null
           ? List<String>.from(jsonDecode(map['secondarymuscles'] as String))
           : null,
+      namePt: map['namePt'] as String?,
       level: map['level'] as String?,
       videoUrl: map['videourl'] as String?,
       equipment: map['equipment'] as String?,

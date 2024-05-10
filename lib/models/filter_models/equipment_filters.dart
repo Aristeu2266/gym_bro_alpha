@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/models/filter_models/filter_model.dart';
 import 'package:gym_bro_alpha/models/filter_models/filter_options.dart';
 import 'package:gym_bro_alpha/utils/custom_icons.dart';
@@ -8,55 +7,55 @@ class EquipmentFilters extends FilterOptions {
   List<FilterModel> get values => [
         FilterModel(
           'All',
-          pic: const Icon(CustomIcons.all),
+          icon: CustomIcons.all,
         ),
         FilterModel(
           'Exercise Ball',
-          pic: const Icon(CustomIcons.exerciseball),
+          icon: CustomIcons.exerciseball,
         ),
         FilterModel(
           'Machine',
-          pic: const Icon(CustomIcons.machine),
+          icon: CustomIcons.machine,
         ),
         FilterModel(
           'Foam Roll',
-          pic: const Icon(CustomIcons.foamroll),
+          icon: CustomIcons.foamroll,
         ),
         FilterModel(
           'Dumbbell',
-          pic: const Icon(CustomIcons.dumbbell),
+          icon: CustomIcons.dumbbell,
         ),
         FilterModel(
           'Barbell',
-          pic: const Icon(CustomIcons.barbell),
+          icon: CustomIcons.barbell,
         ),
         FilterModel(
           'Body Only',
-          pic: const Icon(CustomIcons.bodyonly),
+          icon: CustomIcons.bodyonly,
         ),
         FilterModel(
           'Kettlebell',
-          pic: const Icon(CustomIcons.kettlebell),
+          icon: CustomIcons.kettlebell,
         ),
         FilterModel(
           'Medicine Ball',
-          pic: const Icon(CustomIcons.medicineball),
+          icon: CustomIcons.medicineball,
         ),
         FilterModel(
           'Elastic Band',
-          pic: const Icon(CustomIcons.elasticband),
+          icon: CustomIcons.elasticband,
         ),
         FilterModel(
           'Cable Crossover',
-          pic: const Icon(CustomIcons.cablecrossover),
+          icon: CustomIcons.cablecrossover,
         ),
         FilterModel(
           'E-Z Curl Bar',
-          pic: const Icon(CustomIcons.ezbar),
+          icon: CustomIcons.ezbar,
         ),
         FilterModel(
           'Other',
-          pic: const Icon(CustomIcons.other),
+          icon: CustomIcons.other,
         ),
       ];
 }
