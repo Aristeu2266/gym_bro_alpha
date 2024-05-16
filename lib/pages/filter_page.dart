@@ -22,7 +22,7 @@ class FilterPage extends StatelessWidget {
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
           child: Container(
-            color: Theme.of(context).colorScheme.onBackground,
+            color: Theme.of(context).colorScheme.onSurface,
             height: 2,
           ),
         ),

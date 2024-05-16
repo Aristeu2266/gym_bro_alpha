@@ -7,15 +7,15 @@ class ColorPaletteTestPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ColorScheme myLightScheme = CustomSchemes.greyScheme(Brightness.light);
-    ColorScheme myDarkScheme = CustomSchemes.greyScheme(Brightness.dark);
+    // ColorScheme myDarkScheme = CustomSchemes.greyScheme(Brightness.dark);
     ColorScheme lightScheme = ColorScheme.fromSeed(
       seedColor: const Color(0xff6750a4),
       brightness: Brightness.light,
     );
-    ColorScheme darkScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xff6750a4),
-      brightness: Brightness.dark,
-    );
+    // ColorScheme darkScheme = ColorScheme.fromSeed(
+    //   seedColor: const Color(0xff6750a4),
+    //   brightness: Brightness.dark,
+    // );
 
     return Scaffold(
       appBar: AppBar(),
@@ -242,11 +242,11 @@ class GridColors extends StatelessWidget {
               ),
               GridTile(
                 child: Container(
-                  color: scheme.background,
+                  color: scheme.surface,
                   child: Text(
-                    'background',
+                    'surface',
                     style: TextStyle(
-                      color: scheme.onBackground,
+                      color: scheme.onSurface,
                     ),
                   ),
                 ),
@@ -275,11 +275,11 @@ class GridColors extends StatelessWidget {
               ),
               GridTile(
                 child: Container(
-                  color: scheme.onBackground,
+                  color: scheme.onSurface,
                   child: Text(
-                    'onBackground',
+                    'onSurface',
                     style: TextStyle(
-                      color: scheme.background,
+                      color: scheme.surface,
                     ),
                   ),
                 ),
@@ -312,7 +312,7 @@ class GridColors extends StatelessWidget {
                   child: Text(
                     'onSurfaceVariant',
                     style: TextStyle(
-                      color: scheme.surfaceVariant,
+                      color: scheme.surfaceContainerHighest,
                     ),
                   ),
                 ),
@@ -385,9 +385,9 @@ class GridColors extends StatelessWidget {
               ),
               GridTile(
                 child: Container(
-                  color: scheme.surfaceVariant,
+                  color: scheme.surfaceContainerHighest,
                   child: Text(
-                    'surfaceVariant',
+                    'surfaceContainerHighest',
                     style: TextStyle(
                       color: scheme.onSurfaceVariant,
                     ),

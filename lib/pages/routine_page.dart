@@ -183,9 +183,8 @@ class _RoutinePageState extends State<RoutinePage> {
                 await routine.refresh();
                 setState(() {});
               } on ConnectionException catch (e) {
-                if (mounted) {
-                  Utils.showSnackbar(context, e.message);
-                }
+                if (!context.mounted) return;
+                Utils.showSnackbar(context, e.message);
               }
             },
             child: Column(
@@ -208,7 +207,7 @@ class _RoutinePageState extends State<RoutinePage> {
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 24,
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           ReorderableListView.builder(
@@ -464,7 +463,7 @@ class _RoutinePageState extends State<RoutinePage> {
                       style: TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 22,
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     initialValue: false,

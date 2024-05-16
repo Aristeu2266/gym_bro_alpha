@@ -21,7 +21,7 @@ class AddButton extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 18,
                 decoration: TextDecoration.underline,
               ),

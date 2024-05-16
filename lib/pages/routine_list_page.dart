@@ -156,9 +156,8 @@ class _RoutineListPageState extends State<RoutineListPage> {
             try {
               await routineList.refresh();
             } on ConnectionException catch (e) {
-              if (mounted) {
-                Utils.showSnackbar(context, e.message);
-              }
+              if (!context.mounted) return;
+              Utils.showSnackbar(context, e.message);
             }
           },
           child: Column(
@@ -179,7 +178,7 @@ class _RoutineListPageState extends State<RoutineListPage> {
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.w700,
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           callback: () {

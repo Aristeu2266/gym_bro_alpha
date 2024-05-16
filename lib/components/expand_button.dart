@@ -75,7 +75,7 @@ class ExpandButtonState extends State<ExpandButton>
             child: Icon(
               widget.initialValue ? Icons.expand_less : Icons.expand_more,
               size: 40,
-              color: Theme.of(context).colorScheme.onBackground,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],

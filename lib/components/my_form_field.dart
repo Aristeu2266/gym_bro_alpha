@@ -32,10 +32,10 @@ class MyFormField extends StatelessWidget {
       decoration: InputDecoration(
           errorMaxLines: 2,
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: colorScheme.background),
+            borderSide: BorderSide(color: colorScheme.surface),
           ),
           focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: colorScheme.onBackground),
+              borderSide: BorderSide(color: colorScheme.onSurface),
               gapPadding: 0),
           hintText: hintText,
           hintStyle: TextStyle(

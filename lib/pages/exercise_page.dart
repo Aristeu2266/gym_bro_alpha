@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:gym_bro_alpha/models/exercise_model.dart';
-import 'package:gym_bro_alpha/models/filter_models/equipment_filters.dart';
-import 'package:gym_bro_alpha/models/filter_models/muscle_filters.dart';
+// import 'package:gym_bro_alpha/models/filter_models/equipment_filters.dart';
+// import 'package:gym_bro_alpha/models/filter_models/muscle_filters.dart';
 import 'package:gym_bro_alpha/models/filter_models/type_filters.dart';
 import 'package:gym_bro_alpha/utils/utils.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -23,7 +22,7 @@ class ExercisePage extends StatelessWidget {
     );
 
     TypeFilters typeFilters = TypeFilters();
-    EquipmentFilters equipmentFilters = EquipmentFilters();
+    // EquipmentFilters equipmentFilters = EquipmentFilters();
 
     return Scaffold(
       appBar: AppBar(

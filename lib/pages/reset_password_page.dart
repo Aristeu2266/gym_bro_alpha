@@ -48,7 +48,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         setState(() {
           firebaseException = 'Invalid email';
         });
-      } else if (context.mounted) {
+      } else {
+        if (!mounted) return;
         Utils.showSnackbar(
           context,
           'Connection failed',

@@ -89,7 +89,8 @@ class _AuthFormState extends State<AuthForm>
     } on FirebaseAuthException catch (e) {
       if (e.code != 'network-request-failed') {
         setState(() => validateException = AuthException(e.code));
-      } else if (context.mounted) {
+      } else {
+        if (!mounted) return;
         Utils.showSnackbar(context, 'Connection failed');
       }
     }

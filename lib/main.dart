@@ -111,6 +111,17 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Gym Bro Alpha',
+        // theme: themeSelected != null
+        //     ? ThemeData(
+        //         colorScheme: ColorScheme.fromSeed(
+        //           seedColor: const Color(0xff6750a4),
+        //           brightness: Brightness.light,
+        //         ),
+        //         brightness: Brightness.light,
+        //         useMaterial3: true,
+        //         fontFamily: 'Roboto',
+        //       )
+        //     : null,
         theme: themeSelected != null
             ? ThemeData(
                 colorScheme: CustomSchemes.greyScheme(themeSelected != 2
@@ -123,6 +134,17 @@ class _MyAppState extends State<MyApp> {
                 fontFamily: 'Roboto',
               )
             : null,
+        // darkTheme: themeSelected == 2
+        //     ? ThemeData(
+        //         colorScheme: ColorScheme.fromSeed(
+        //           seedColor: const Color(0xff6750a4),
+        //           brightness: Brightness.dark,
+        //         ),
+        //         brightness: Brightness.dark,
+        //         useMaterial3: true,
+        //         fontFamily: 'Roboto',
+        //       )
+        //     : null,
         darkTheme: themeSelected == 2
             ? ThemeData(
                 colorScheme: CustomSchemes.greyScheme(Brightness.dark),

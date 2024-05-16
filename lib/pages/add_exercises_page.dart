@@ -263,7 +263,7 @@ class FilterButton extends StatelessWidget {
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: (selected ?? 'all') == 'all'
-                ? colorScheme.background
+                ? colorScheme.surface
                 : colorScheme.onPrimary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),

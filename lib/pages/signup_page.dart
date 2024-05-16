@@ -145,15 +145,14 @@ class _SignupPageState extends State<SignupPage>
                                     try {
                                       await AuthService.signInWithGoogle();
                                     } catch (e) {
-                                      if (mounted) {
-                                        setState(() {
-                                          _isLoading = false;
-                                        });
-                                        Utils.showSnackbar(
-                                          context,
-                                          'Connection failed',
-                                        );
-                                      }
+                                      if (!context.mounted) return;
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                      Utils.showSnackbar(
+                                        context,
+                                        'Connection failed',
+                                      );
                                     }
                                   },
                                   style: ElevatedButton.styleFrom(

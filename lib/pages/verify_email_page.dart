@@ -78,9 +78,8 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
 
       if (_isEmailVerified) {
         timer?.cancel();
-        if (context.mounted) {
-          Navigator.pushReplacementNamed(context, PageRoutes.home);
-        }
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, PageRoutes.home);
       }
     } catch (_) {
       AuthService.signOut().then((_) {
@@ -90,9 +89,8 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>
         );
       });
 
-      if (context.mounted) {
-        Utils.showSnackbar(context, 'Connection failed');
-      }
+      if (!mounted) return;
+      Utils.showSnackbar(context, 'Connection failed');
     }
   }
 

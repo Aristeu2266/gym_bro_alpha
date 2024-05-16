@@ -18,8 +18,8 @@ class MyButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
-        backgroundColor: colorScheme.onBackground,
-        foregroundColor: colorScheme.background,
+        backgroundColor: colorScheme.onSurface,
+        foregroundColor: colorScheme.surface,
         minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),

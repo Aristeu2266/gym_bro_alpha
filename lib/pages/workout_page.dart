@@ -124,7 +124,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 24,
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           ReorderableListView.builder(
