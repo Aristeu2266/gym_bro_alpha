@@ -33,10 +33,10 @@ class _AddExercisesPageState extends State<AddExercisesPage> {
     _scrollController = ScrollController()
       ..addListener(
         () {
-          if (_scrollController.position.atEdge &&
-              _scrollController.position.pixels != 0) {
+          if (_scrollController.position.maxScrollExtent -
+                  _scrollController.position.pixels <
+              100) {
             setState(() {
-              print('opa');
               loaded += 1;
             });
           }

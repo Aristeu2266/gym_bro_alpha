@@ -156,7 +156,7 @@ class _MyAppState extends State<MyApp> {
         routes: {
           // TODO: Loading page
           PageRoutes.root: (_) => themeSelected == null
-              ? const Text('Loading')
+              ? Container(color: Colors.yellow)
               : AuthPage(refreshTheme: loadTheme),
           PageRoutes.login: (_) => const LoginPage(),
           PageRoutes.signup: (_) => const SignupPage(),

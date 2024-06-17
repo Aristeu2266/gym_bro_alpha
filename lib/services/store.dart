@@ -127,7 +127,7 @@ class Store {
 
     for (Map<String, dynamic> group in groups) {
       if (lastLogin == 'null' ||
-          DateTime.parse(group['lastUpdate'])
+          DateTime.parse(group['lastupdate'])
               .isAfter(DateTime.parse(lastLogin))) {
         for (Map<String, dynamic> exercise in group['exercises']) {
           db.insert(
@@ -143,13 +143,16 @@ class Store {
     Map<String, dynamic> exercise,
     List<String> exerciseSchema,
   ) {
+    Map<String, dynamic> converted = {};
     for (String element in exerciseSchema) {
       if (exercise[element] is List) {
-        exercise[element] = jsonEncode(exercise[element]);
+        converted[element] = jsonEncode(exercise[element]);
+      } else {
+        converted[element] = exercise[element];
       }
     }
 
-    return exercise;
+    return converted;
   }
 
   static Future<int> updateSignInDate(String uid) async {

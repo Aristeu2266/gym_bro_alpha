@@ -18,7 +18,7 @@ class AuthPage extends StatelessWidget {
         } else {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // TODO: loading page
-            return const Text('Loading2');
+            return Container(color: Colors.orange);
           }
           return const LoginPage();
         }

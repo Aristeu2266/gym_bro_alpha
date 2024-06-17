@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/components/app_logo.dart';
 import 'package:gym_bro_alpha/components/sign_bottom_text.dart';
-import 'package:gym_bro_alpha/pages/signup_page.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/utils.dart';
@@ -73,40 +72,44 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(
                         child: _isLoading
                             ? const CircularProgressIndicator()
-                            : ElevatedButton(
-                                onPressed: () async {
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
-                                  try {
-                                    await AuthService.signInWithGoogle();
-                                  } catch (e) {
-                                    if (!context.mounted) return;
+                            : Hero(
+                                tag: 'googlepic',
+                                child: ElevatedButton(
+                                  onPressed: () async {
                                     setState(() {
-                                      _isLoading = false;
+                                      _isLoading = true;
                                     });
-                                    Utils.showSnackbar(
-                                      context,
-                                      'Connection failed',
-                                    );
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: colorScheme.primaryContainer,
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Hero(
-                                      tag: 'googlepic',
-                                      child: Image.asset(
-                                        'assets/images/google.png',
-                                        height: 20,
-                                      ),
+                                    try {
+                                      await AuthService.signInWithGoogle();
+                                    } catch (e) {
+                                      if (!context.mounted) return;
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                      Utils.showSnackbar(
+                                        context,
+                                        'Connection failed',
+                                      );
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        colorScheme.primaryContainer,
+                                  ),
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Image.asset(
+                                          'assets/images/google.png',
+                                          height: 20,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        const Text('Log in with Google'),
+                                      ],
                                     ),
-                                    const SizedBox(width: 10),
-                                    const Text('Log in with Google'),
-                                  ],
+                                  ),
                                 ),
                               ),
                       ),
@@ -145,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                 color: colorScheme.primary,
                 text: 'Don\'t have an account? ',
                 clickable: 'Sign Up.',
-                page: const SignupPage(),
+                onTap: () => Navigator.of(context).pushNamed(PageRoutes.signup),
               ),
             ],
           ),

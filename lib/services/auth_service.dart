@@ -39,6 +39,6 @@ class AuthService {
       idToken: gAuth.idToken,
     );
 
-    return _auth.signInWithCredential(credential);
+    return await _auth.signInWithCredential(credential);
   }
 }

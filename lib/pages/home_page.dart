@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> {
       appBar: _appBar(),
       // TODO: Loading Page
       body: _isLoading
-          ? const Text('Loading3')
+          ? Container(color: Colors.red)
           : PageView(
               controller: pageController,
               onPageChanged: (value) => setState(() => screenIndex = value),

@@ -4,18 +4,19 @@ class SignBottomText extends StatelessWidget {
   SignBottomText({
     this.text,
     required this.color,
-    this.page,
     this.clickable,
+    this.onTap,
     super.key,
-  }){
-    assert (text != null || clickable != null);
-    assert ((clickable != null && page != null) || (clickable == null && page == null));
+  }) {
+    assert(text != null || clickable != null);
+    assert((clickable != null && onTap != null) ||
+        (clickable == null && onTap == null));
   }
 
   final String? text;
   final Color color;
-  final Widget? page;
   final String? clickable;
+  final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -32,14 +33,7 @@ class SignBottomText extends StatelessWidget {
                 if (text != null) Text(text!),
                 if (clickable != null)
                   GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder: (ctx, animation1, animation2) => page!,
-                        ),
-                      );
-                    },
+                    onTap: onTap,
                     child: Text(
                       clickable!,
                       style: TextStyle(

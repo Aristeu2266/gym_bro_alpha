@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gym_bro_alpha/components/app_logo.dart';
 import 'package:gym_bro_alpha/components/auth_form.dart';
 import 'package:gym_bro_alpha/components/sign_bottom_text.dart';
-import 'package:gym_bro_alpha/pages/login_page.dart';
 import 'package:gym_bro_alpha/services/auth_service.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/utils.dart';
@@ -143,7 +142,9 @@ class _SignupPageState extends State<SignupPage>
                                       _isLoading = true;
                                     });
                                     try {
-                                      await AuthService.signInWithGoogle();
+                                      await AuthService.signInWithGoogle().then(
+                                        (_) => Navigator.of(context).pop(),
+                                      );
                                     } catch (e) {
                                       if (!context.mounted) return;
                                       setState(() {
@@ -206,7 +207,7 @@ class _SignupPageState extends State<SignupPage>
           SignBottomText(
             clickable: 'Already have an account?',
             color: colorScheme.primary,
-            page: const LoginPage(),
+            onTap: () => Navigator.of(context).pop(),
           ),
         ],
       ),
