@@ -47,7 +47,7 @@ class SettingsPage extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.onInverseSurface,
+                backgroundColor: colorScheme.surfaceContainerHighest,
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -59,10 +59,11 @@ class SettingsPage extends StatelessWidget {
                 Icons.color_lens,
                 color: Colors.orange,
               ),
-              label: const Text(
+              label: Text(
                 'Color Palette Test Page',
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ),
@@ -74,7 +75,7 @@ class SettingsPage extends StatelessWidget {
                 DB.recreate();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.onInverseSurface,
+                backgroundColor: colorScheme.surfaceContainerHighest,
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -86,10 +87,11 @@ class SettingsPage extends StatelessWidget {
                 Icons.delete,
                 color: Colors.red,
               ),
-              label: const Text(
+              label: Text(
                 'DELETE DATABASE',
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ),
@@ -108,7 +110,7 @@ class SettingsPage extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.onInverseSurface,
+                backgroundColor: colorScheme.surfaceContainerHighest,
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -120,10 +122,11 @@ class SettingsPage extends StatelessWidget {
                 Icons.logout,
                 color: Colors.red,
               ),
-              label: const Text(
+              label: Text(
                 'Log Out',
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ),
@@ -159,7 +162,7 @@ class ThemeSelectMenu extends StatelessWidget {
             : themeSelected != 2
                 ? Icons.dark_mode
                 : Icons.brightness_auto_sharp,
-        color: colorScheme.onPrimaryContainer,
+        color: colorScheme.primary,
       ),
       enableFilter: false,
       dropdownMenuEntries: [
@@ -168,7 +171,7 @@ class ThemeSelectMenu extends StatelessWidget {
           label: 'Light',
           trailingIcon: Icon(
             Icons.light_mode,
-            color: colorScheme.onPrimaryContainer,
+            color: colorScheme.primary,
           ),
         ),
         DropdownMenuEntry<int>(
@@ -176,7 +179,7 @@ class ThemeSelectMenu extends StatelessWidget {
           label: 'Dark',
           trailingIcon: Icon(
             Icons.dark_mode,
-            color: colorScheme.onPrimaryContainer,
+            color: colorScheme.primary,
           ),
         ),
         DropdownMenuEntry<int>(
@@ -184,7 +187,7 @@ class ThemeSelectMenu extends StatelessWidget {
           label: 'Auto',
           trailingIcon: Icon(
             Icons.brightness_auto_sharp,
-            color: colorScheme.onPrimaryContainer,
+            color: colorScheme.primary,
           ),
         ),
       ],

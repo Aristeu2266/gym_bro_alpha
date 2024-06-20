@@ -73,7 +73,7 @@ class _SignupPageState extends State<SignupPage>
               duration: const Duration(milliseconds: 150),
               child: AppLogo(
                 key: UniqueKey(),
-                color: colorScheme.onPrimaryContainer,
+                color: colorScheme.onSurface,
                 iconSize: 60,
                 fontSize: 36,
                 showText: _showName,

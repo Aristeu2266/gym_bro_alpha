@@ -19,13 +19,6 @@ class FilterPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Select ${filter.label}'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(2),
-          child: Container(
-            color: Theme.of(context).colorScheme.onSurface,
-            height: 2,
-          ),
-        ),
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
@@ -69,7 +62,7 @@ class FilterList extends StatelessWidget {
           onTap: () {},
           child: Container(
             color: selected == filterObj.values[index].label.toLowerCase()
-                ? colorScheme.onPrimary
+                ? colorScheme.inversePrimary
                 : null,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -78,12 +71,20 @@ class FilterList extends StatelessWidget {
                   height: 50,
                   width: 50,
                   decoration: BoxDecoration(
-                    color: colorScheme.secondaryContainer,
+                    color:
+                        selected == filterObj.values[index].label.toLowerCase()
+                            ? colorScheme.primaryContainer
+                            : colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: filterObj.values[index].pic,
+                  child: filterObj.values[index].widget(colorScheme.onSurface),
                 ),
-                title: Text(filterObj.values[index].label),
+                title: Text(
+                  filterObj.values[index].label,
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
+                  ),
+                ),
                 onTap: () =>
                     Navigator.pop(context, filterObj.values[index].label),
               ),

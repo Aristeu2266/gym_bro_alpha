@@ -8,7 +8,7 @@ class MuscleFilters extends FilterOptions {
   List<FilterModel> get values => [
         FilterModel(
           'All',
-          pic: const Icon(CustomIcons.all),
+          icon: CustomIcons.all,
         ),
         FilterModel(
           'Neck',
