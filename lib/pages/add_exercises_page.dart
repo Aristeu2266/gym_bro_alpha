@@ -234,15 +234,6 @@ class _AddExercisesPageState extends State<AddExercisesPage> {
   }
 }
 
-class ExerciseTile extends StatelessWidget {
-  const ExerciseTile({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
 class FilterButton extends StatelessWidget {
   const FilterButton(
       {required this.filter,
@@ -264,7 +255,7 @@ class FilterButton extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: (selected ?? 'all') == 'all'
                 ? colorScheme.surface
-                : colorScheme.onPrimary,
+                : colorScheme.primaryContainer,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -287,9 +278,15 @@ class FilterButton extends StatelessWidget {
               Icon(
                 filter.iconData,
                 size: 25,
+                color: colorScheme.onSurface,
               ),
               const SizedBox(width: 4),
-              Text(filter.label),
+              Text(
+                filter.label,
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                ),
+              ),
             ],
           ),
         ),
@@ -309,7 +306,7 @@ class FilterButton extends StatelessWidget {
                 },
                 icon: Icon(
                   Icons.cancel,
-                  color: colorScheme.errorContainer,
+                  color: Colors.redAccent[100],
                 ),
               ),
             ),

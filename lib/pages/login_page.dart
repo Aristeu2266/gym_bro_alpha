@@ -40,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: Hero(
                           tag: 'logo',
                           child: AppLogo(
-                            color: colorScheme.onPrimaryContainer,
+                            color: colorScheme.onSurface,
                             iconSize: 60,
                             fontSize: 36,
                           ),

@@ -8,22 +8,28 @@ class CustomSchemes {
     );
 
     ColorScheme newScheme = brightness == Brightness.light
-        ? colorScheme.copyWith(
-            primary: colorScheme.secondary,
-            onPrimary: colorScheme.inversePrimary, //colorScheme.onSecondary,
-            primaryContainer: colorScheme.secondaryContainer,
-            onPrimaryContainer: colorScheme.onSecondaryContainer,
-            secondary: Colors.white,
-            onSecondary: const Color(0xff1c1b1e),
-            inversePrimary: colorScheme.inverseSurface)
+        ? colorScheme.copyWith()
         : colorScheme.copyWith(
-            primary: colorScheme.secondary,
-            onPrimary: colorScheme.onSecondary,
-            primaryContainer: colorScheme.secondaryContainer,
-            onPrimaryContainer: colorScheme.onSecondaryContainer,
-            secondary: Colors.white,
-            onSecondary: const Color(0xff1c1b1e),
-            inversePrimary: colorScheme.inverseSurface);
+            // onSurfaceVariant: Colors.amber,
+            );
+
+    // ColorScheme newScheme = brightness == Brightness.light
+    //     ? colorScheme.copyWith(
+    //         primary: colorScheme.secondary,
+    //         onPrimary: colorScheme.inversePrimary, //colorScheme.onSecondary,
+    //         primaryContainer: colorScheme.secondaryContainer,
+    //         onPrimaryContainer: colorScheme.onSecondaryContainer,
+    //         secondary: Colors.white,
+    //         onSecondary: const Color(0xff1c1b1e),
+    //         inversePrimary: colorScheme.inverseSurface)
+    //     : colorScheme.copyWith(
+    //         primary: colorScheme.secondary,
+    //         onPrimary: colorScheme.onSecondary,
+    //         primaryContainer: colorScheme.secondaryContainer,
+    //         onPrimaryContainer: colorScheme.onSecondaryContainer,
+    //         secondary: Colors.white,
+    //         onSecondary: const Color(0xff1c1b1e),
+    //         inversePrimary: colorScheme.inverseSurface);
 
     return newScheme;
   }
