@@ -3,7 +3,7 @@ import 'package:gym_bro_alpha/components/expand_button.dart';
 import 'package:gym_bro_alpha/exceptions/connection_exception.dart';
 import 'package:gym_bro_alpha/models/routine_model.dart';
 import 'package:gym_bro_alpha/models/workout_model.dart';
-import 'package:gym_bro_alpha/pages/add_button.dart';
+import 'package:gym_bro_alpha/components/add_button.dart';
 import 'package:gym_bro_alpha/utils/constants.dart';
 import 'package:gym_bro_alpha/utils/utils.dart';
 import 'package:provider/provider.dart';

@@ -15,7 +15,7 @@ class ExercisePage extends StatelessWidget {
         ModalRoute.of(context)?.settings.arguments as ExerciseModel;
 
     YoutubePlayerController controller = YoutubePlayerController(
-      initialVideoId: (exercise.videoUrl ?? '').split('?v= + ')[1],
+      initialVideoId: (exercise.videoUrl ?? '').split('?v=')[1],
       flags: const YoutubePlayerFlags(
         autoPlay: false,
       ),

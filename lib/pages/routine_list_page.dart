@@ -6,7 +6,7 @@ import 'package:gym_bro_alpha/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 import '../components/expand_button.dart';
-import 'add_button.dart';
+import '../components/add_button.dart';
 
 class RoutineListPage extends StatefulWidget {
   const RoutineListPage({super.key});
