@@ -38,10 +38,6 @@ class MyFormField extends StatelessWidget {
               borderSide: BorderSide(color: colorScheme.onSurface),
               gapPadding: 0),
           hintText: hintText,
-          hintStyle: TextStyle(
-            color: colorScheme.onPrimaryContainer,
-          ),
-          fillColor: colorScheme.primaryContainer,
           filled: true,
           errorText: errorText,
           contentPadding: contentPadding,

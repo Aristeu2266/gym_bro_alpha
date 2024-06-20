@@ -24,6 +24,7 @@ class ExercisePage extends StatelessWidget {
     TypeFilters typeFilters = TypeFilters();
     // EquipmentFilters equipmentFilters = EquipmentFilters();
 
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -116,7 +117,7 @@ class ExercisePage extends StatelessWidget {
                                           element.label.toLowerCase() ==
                                           exercise.category.toLowerCase(),
                                     )
-                                    .pic ??
+                                    .widget(colorScheme.onSurface) ??
                                 const Text('Erro'),
                           ],
                         ),
